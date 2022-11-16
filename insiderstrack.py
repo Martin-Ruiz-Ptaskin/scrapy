@@ -38,8 +38,10 @@ while 1==1:
         value =fill.find_all("td")[12].getText()
         fills =filing(date,code,company,trade,cargo,value,insider)
         fillings.append(fills)  
-    print(fillings[0].company,fillings[1].company)
-    time.sleep(10)
+    for fill in fillings:
+     print(fill.company,fill.company,fill.code,fill.insider,fill.value,fill.date)
+
+       
 
 
 """1 date ,3 code,4 company, 5 insider, 6 cargo, 7 trade tyoe, 12 value"""

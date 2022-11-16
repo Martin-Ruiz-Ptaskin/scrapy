@@ -6,6 +6,7 @@ Created on Fri Oct 21 21:54:05 2022
 """
 
 import time
+import random
 import mysql.connector
 from mysql.connector import Error
 from selenium import webdriver 
@@ -64,31 +65,38 @@ for rest in myresult:
 """----------------------FIN CONECCION----------------------------"""
 acciones=[]
 def func(threads,url):
- 
+ """ driver.get('https://www.etoro.com/login')
+ driver.find_element_by_id("username").send_keys("martinruizptaskin.10@gmail.com")
+ # find password input field and insert password as well
+ driver.find_element_by_id("password").send_keys("Dell1234_")
+ driver.find_element_by_class_name("button-default blue-btn").click()"""
+
+ nones=[]
  for u in url: 
    driver = webdriver.Chrome(executable_path=r'C:\\Users\\mruizpta\\chromedriver_win32\\chromedriver.exe')
-
+   
+   """time.sleep( random.randint(0,3))"""
    driver.get('https://www.etoro.com/people/'+u+'/portfolio')
    autoss = driver.find_elements_by_xpath('//ui-table-body[@class="ng-scope"]')
    autos = driver.find_elements_by_xpath('//div[@class="i-portfolio-table-instrument"]')
-   
+   print(u," ",len(autos))
+   if len(autos) ==0:
+    nones.append(u)    
    for auto in autos:
             # Por cada anuncio hallo el preico
     stock = auto.find_element_by_xpath('.//div[@class="i-portfolio-table-name"]').text
-    print(stock)
-
+    """print(stock)"""
     acciones.append(stock)
   
    driver.close()
- 
- 
-	
-
-url =['garudolf']
+ print(len(nones))
 
 
+url =['garudolf','SiNeXo','JCA623','hambear','difaman','gauravk_in','HarpinderKang','jrotllant','BrunoBGomes','AntonioNobileC','JORDENBOER','Enslinjaco','ChineseMoney','yrm_capital','Saphirtal','Marinzgb','RauchenwaldC','Changweihsiao','hedge_fund','kingbravo10','creativemedia','CostelStoica','AmitKup','SwissWay','AlexKway','JeepsonTrading','acetoandrea','Alexebi','Nasdaki','bluewr','SalvadorMaV','LoicInv','Isiahjames','dhanpreet452','StanleyTaiwan','Annogo','adams302','OGFyahH','IngwarLattke','Flasky78','RiftenGuard','JDayTradesPro','jurajgazo','mrstocky','iliescu2605','SimoFo7','QualityHedge','Finanzzyklen','dipratom','ChaoyuanLee','smrinvestment','Tinak888','celesh','onlybacktesting','Praxantor','Charlotte2025','OliveTreeFund','Contraryfairy','raphaelpizzaia','GotfridsGirgens','Vibenpe','thomaspj','Matt1122','B3130jim','Ollipoud','olddriller','Walladoo','bryan01993','Josephpizza','FrancescoWeber','PraguermFx','Smahmood006','josephkfoury','xCorsarz_RCV','Steady-growth','Cipino90','ChartMatthew','Analisisciclico','felipehid','calintrading','jocjohnson','AndreaMarcon16','MaxDividend','ioatri','ingruc','HappyOwlz','Aukie2008','Stranden93','a11680','DmitriiIshutin','AnnGnep','PairsageGroup','RonaldTagsuan','conjepense','Floriana1']
 
-cantidad=round(len(url)/1)
+
+
+cantidad=round(len(url)/25)
 barrier = Barrier(cantidad)
 def get_sublists(original_list, number_of_sub_list_wanted):
  sublists = list()
