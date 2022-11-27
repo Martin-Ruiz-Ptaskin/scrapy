@@ -82,7 +82,7 @@ url =['34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo','bc1qgdjqv0av3q56jvd82tkdjpy7gdp9ut8t
 
 
 
-cantidad=round(len(url)/25)
+cantidad=round(len(url)/10)
 barrier = Barrier(cantidad)
 def get_sublists(original_list, number_of_sub_list_wanted):
  sublists = list()
@@ -121,7 +121,7 @@ for tag in amount:
   
   """ con este actualizo """
  if(1==1):
-  print("entea en dos")
+
   for cache in cachelist:
             
             

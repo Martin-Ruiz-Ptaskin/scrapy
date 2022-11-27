@@ -63,40 +63,71 @@ for rest in myresult:
     resultados= cartera(rest[0],rest[1])
     cachelist.append(resultados)"""
 """----------------------FIN CONECCION----------------------------"""
-acciones=[]
+inversores=[]
 def func(threads,url):
- """ driver.get('https://www.etoro.com/login')
- driver.find_element_by_id("username").send_keys("martinruizptaskin.10@gmail.com")
- # find password input field and insert password as well
- driver.find_element_by_id("password").send_keys("Dell1234_")
- driver.find_element_by_class_name("button-default blue-btn").click()"""
 
- nones=[]
+
+ 
+ vacios=[]
  for u in url: 
    driver = webdriver.Chrome(executable_path=r'C:\\Users\\mruizpta\\chromedriver_win32\\chromedriver.exe')
    
-   """time.sleep( random.randint(0,3))"""
+   time.sleep( random.randint(0,3))
    driver.get('https://www.etoro.com/people/'+u+'/portfolio')
-   autoss = driver.find_elements_by_xpath('//ui-table-body[@class="ng-scope"]')
    autos = driver.find_elements_by_xpath('//div[@class="i-portfolio-table-instrument"]')
    print(u," ",len(autos))
+   
    if len(autos) ==0:
-    nones.append(u)    
-   for auto in autos:
-            # Por cada anuncio hallo el preico
-    stock = auto.find_element_by_xpath('.//div[@class="i-portfolio-table-name"]').text
-    """print(stock)"""
-    acciones.append(stock)
-  
+    print ("No tiene nada")
+    vacios.append(u) 
+
+   acciones=[] 
+   if len(autos) >0:
+       for auto in autos:
+                # Por cada anuncio hallo el preico
+        stock = auto.find_element_by_xpath('.//div[@class="i-portfolio-table-name"]').text
+        """print(stock)"""
+        acciones.append(stock)
+       inversor= innversor(u,acciones)
+       inversores.append(inversor) 
    driver.close()
- print(len(nones))
+ print(len(inversores),"inversores len")
+ print(len(vacios),"vacios len")
+ print(len(url),"url len")
+ print(len(vacios)/len(url))
+ while (len(vacios)/len(url))>0.25:
+  for u in vacios: 
+   driver = webdriver.Chrome(executable_path=r'C:\\Users\\mruizpta\\chromedriver_win32\\chromedriver.exe')
+   
+   time.sleep( random.randint(0,3))
+   driver.get('https://www.etoro.com/people/'+u+'/portfolio')
+   autos = driver.find_elements_by_xpath('//div[@class="i-portfolio-table-instrument"]')
+   print(u," ",len(autos))
+   print(u)
+   
+   if len(autos) ==0:
+    print ("No tiene nada")
+    
 
-
+   acciones=[] 
+   if len(autos) >0:
+       vacios.remove(u)
+       for auto in autos:
+                # Por cada anuncio hallo el preico
+        stock = auto.find_element_by_xpath('.//div[@class="i-portfolio-table-name"]').text
+        """print(stock)"""
+        acciones.append(stock)
+       inversor= innversor(u,acciones)
+       inversores.append(inversor) 
+   driver.close()   
+ print(len(inversores),"inversores len")
+ print(len(vacios),"vacios len")
+ print(len(url),"url len")
 url =['garudolf','SiNeXo','JCA623','hambear','difaman','gauravk_in','HarpinderKang','jrotllant','BrunoBGomes','AntonioNobileC','JORDENBOER','Enslinjaco','ChineseMoney','yrm_capital','Saphirtal','Marinzgb','RauchenwaldC','Changweihsiao','hedge_fund','kingbravo10','creativemedia','CostelStoica','AmitKup','SwissWay','AlexKway','JeepsonTrading','acetoandrea','Alexebi','Nasdaki','bluewr','SalvadorMaV','LoicInv','Isiahjames','dhanpreet452','StanleyTaiwan','Annogo','adams302','OGFyahH','IngwarLattke','Flasky78','RiftenGuard','JDayTradesPro','jurajgazo','mrstocky','iliescu2605','SimoFo7','QualityHedge','Finanzzyklen','dipratom','ChaoyuanLee','smrinvestment','Tinak888','celesh','onlybacktesting','Praxantor','Charlotte2025','OliveTreeFund','Contraryfairy','raphaelpizzaia','GotfridsGirgens','Vibenpe','thomaspj','Matt1122','B3130jim','Ollipoud','olddriller','Walladoo','bryan01993','Josephpizza','FrancescoWeber','PraguermFx','Smahmood006','josephkfoury','xCorsarz_RCV','Steady-growth','Cipino90','ChartMatthew','Analisisciclico','felipehid','calintrading','jocjohnson','AndreaMarcon16','MaxDividend','ioatri','ingruc','HappyOwlz','Aukie2008','Stranden93','a11680','DmitriiIshutin','AnnGnep','PairsageGroup','RonaldTagsuan','conjepense','Floriana1']
 
 
 
-cantidad=round(len(url)/25)
+cantidad=round(len(url)/(len(url)/3))
 barrier = Barrier(cantidad)
 def get_sublists(original_list, number_of_sub_list_wanted):
  sublists = list()
@@ -119,20 +150,10 @@ for i in threads:
         
 
 print(len(amount))
-for tag in amount:
-    
-
- amount= tag.amount.replace(',','')
-   
- amount= amount.replace(',','.')
- """ con este cargo nuevos con borrado previo """
- if(1==2): 
-
-  print("entra aca")
-  query="INSERT INTO `bitcoin`(`wallet`, `amount`) VALUES ('"+ tag.wallet +"','"+amount+"')"
-  execute_query(connection, query)
+for tag in inversores:
+    print (tag.investor, tag.stock)
+ 
   
-  
-  """ con este actualizo """
+ 
  
    
