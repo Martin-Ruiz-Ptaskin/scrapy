@@ -92,8 +92,8 @@ try:
        value =fill.find_all("td")[12].getText()
        fills =filing(date,code,company,trade,cargo,value,insider)
        fillings.append(fills)
-  except:
-    print("no se pudieron obtner los datos")
+  except Error as err:
+    print(err)
   contenido = open(r"C:\Users\mruizpta\scrapy\InsiderKeyList.txt", "w")
   for fill in fillings:
     key= fill.insider+fill.value+fill.date 
@@ -110,5 +110,5 @@ try:
   contenido.close()
 
 except:
-  print("error")
+  print(Error)
 
