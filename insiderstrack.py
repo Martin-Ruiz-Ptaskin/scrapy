@@ -20,7 +20,7 @@ def create_db_connection(host_name, user_name, user_password, db_name):
             user=user_name,
             passwd=user_password,
             database=db_name
-        )
+        )   
         print("MySQL Database connection successful")
     except Error as err:
         print(f"Error: '{err}'")
@@ -63,6 +63,8 @@ class filing:
         self.insider = insider
 
 def mainInsider():
+    
+    
     try:
       try:
        datos = urllib.request.urlopen("http://openinsider.com/screener?s=&o=&pl=&ph=&ll=&lh=&fd=730&fdr=&td=0&tdr=&fdlyl=&fdlyh=&daysago=&xp=1&xs=1&vl=&vh=&ocl=&och=&sic1=-1&sicl=100&sich=9999&grp=0&nfl=&nfh=&nil=&nih=&nol=&noh=&v2l=&v2h=&oc2l=&oc2h=&sortcol=0&cnt=100&page=1").read().decode()
@@ -77,14 +79,12 @@ def mainInsider():
        lista=""
       
 
-       contenido = open(r"InsiderKeyList.txt", "r")
-
-       for línea in contenido:
-         lista=línea
-         previos=lista.split("/")
-         """print (previos)"""
-                
-       contenido.close()
+       mycursor.execute("SELECT clave FROM `insiderkey`")
+       contenido=[]
+       myresultado = mycursor.fetchall()        
+       for rest in myresultado:
+            print(rest[0])
+            contenido.append(rest[0])
                 
          
        for fill in line:
@@ -101,19 +101,19 @@ def mainInsider():
            fillings.append(fills)
       except Error as err:
         print(err)
-      contenido = open(r"InsiderKeyList.txt", "w")
       for fill in fillings:
         key= fill.insider+fill.value+fill.date 
 
-        contenido.write(key+"/")
 
-        if key in previos:
+        if key in contenido:
          print(key+"existe")
         else:
            print(key+"no existe")
            query="INSERT INTO `insider`( `clave`, `name`, `company`, `amount`, `trade`, `date`) VALUES ('"+fill.company+"','" +fill.insider+"','"+fill.code +"','"+fill.value+"','"+fill.tradetype+"','"+fill.date+"')"
            execute_query(connection, query)
            print(fill.tradetype)
+           query = "INSERT INTO `insiderkey`(`clave`) VALUES ('" +key+"' )"
+           execute_query(connection, query)
            operacion =""
            if fill.tradetype=="P - Purchase":
                operacion="compra"
@@ -131,4 +131,4 @@ def mainInsider():
     except:
       print(Error)
 
-
+mainInsider()

@@ -10,7 +10,6 @@ import json
 import requests
 import json
 from selenium import webdriver 
-driver = webdriver.Chrome(executable_path=r'chromedriver.exe')
 from selenium.webdriver.common.by import By
 import matplotlib.pyplot as plt
 import mysql.connector
@@ -81,6 +80,7 @@ assets_vendidos=[]
 assets_comprados=[]
 
 def crearNotificaciones(ActyvityFromBD,activity,name):
+    
     frombd=json.loads(ActyvityFromBD)
     actividad=json.loads(activity)
     
@@ -106,7 +106,7 @@ def crearNotificaciones(ActyvityFromBD,activity,name):
                         assets_vendidos.append(ListaActivosInversor(activo['InstrumentID'],diferencia,0))
                        print("activosenoperaciones")
                        query2 = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento`) VALUES ('" + \
-                       activo['InstrumentID']+ "','"+name+ "','"+str(diferencia)+ "','-','"+ operacion + "')"
+                       activo['InstrumentID']+ "','"+name+ "','0 ','-','"+ operacion + "')"
                        execute_query(connection, query2)
                if(diferencia >0):
                        operacion="compra"
@@ -122,7 +122,7 @@ def crearNotificaciones(ActyvityFromBD,activity,name):
                        print("activosenoperaciones")
 
                        query2 = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento`) VALUES ('" + \
-                       activo['InstrumentID']+ "','"+name+ "','"+str(diferencia)+ "','-','"+ operacion + "')"
+                       activo['InstrumentID']+ "','"+name+ "','0','-','"+ operacion + "')"
                        execute_query(connection, query2)
 
 
@@ -131,6 +131,8 @@ def crearNotificaciones(ActyvityFromBD,activity,name):
 mycursor = mydb.cursor()
 
 def Etoromain():
+    driver = webdriver.Chrome(executable_path=r'chromedriver.exe')
+
     mycursor.execute("SELECT * FROM `inversores`")
     cachelist=[]
     myresult = mycursor.fetchall()        
@@ -138,10 +140,9 @@ def Etoromain():
        resultados= investor(rest[1],rest[2],"")
        cachelist.append(resultados)
 
-    url =['robier89','JCA623','JORDENBOER','Enslinjaco','ChineseMoney']
-    """,'SiNeXo','BrunoBGomes','AntonioNobileC','JORDENBOER','Enslinjaco','ChineseMoney','yrm_capital','Saphirtal','Marinzgb','RauchenwaldC','Changweihsiao','hedge_fund','kingbravo10','creativemedia','CostelStoica','AmitKup','SwissWay','AlexKway','JeepsonTrading','acetoandrea','Alexebi','Nasdaki','bluewr','SalvadorMaV','LoicInv','Isiahjames','dhanpreet452','StanleyTaiwan','Annogo','adams302','OGFyahH','IngwarLattke','Flasky78','RiftenGuard','JDayTradesPro','jurajgazo','mrstocky','iliescu2605','SimoFo7','QualityHedge','Finanzzyklen','dipratom','ChaoyuanLee','smrinvestment','Tinak888','celesh','onlybacktesting','Praxantor','Charlotte2025','OliveTreeFund','Contraryfairy','raphaelpizzaia','GotfridsGirgens','Vibenpe','thomaspj','Matt1122','B3130jim','Ollipoud','olddriller','Walladoo','bryan01993','Josephpizza','FrancescoWeber','PraguermFx','Smahmood006','josephkfoury','xCorsarz_RCV','Steady-growth','Cipino90','ChartMatthew','Analisisciclico','felipehid','calintrading','jocjohnson','AndreaMarcon16','MaxDividend','ioatri','ingruc','HappyOwlz','Aukie2008','Stranden93','a11680','DmitriiIshutin','AnnGnep','PairsageGroup','RonaldTagsuan','conjepense','Floriana1']
+    url =['robier89' ,'JCA623','JORDENBOER','Enslinjaco','ChineseMoney' ,'SiNeXo','BrunoBGomes','AntonioNobileC','JORDENBOER','Enslinjaco','ChineseMoney','yrm_capital','Saphirtal','Marinzgb','RauchenwaldC','Changweihsiao','hedge_fund','kingbravo10','creativemedia','CostelStoica','AmitKup','SwissWay','AlexKway','JeepsonTrading','acetoandrea','Alexebi','Nasdaki','bluewr','SalvadorMaV','LoicInv','Isiahjames','dhanpreet452','StanleyTaiwan','Annogo','adams302','OGFyahH','IngwarLattke','Flasky78','RiftenGuard','JDayTradesPro','jurajgazo','mrstocky','iliescu2605','SimoFo7','QualityHedge','Finanzzyklen','dipratom','ChaoyuanLee','smrinvestment','Tinak888','celesh','onlybacktesting','Praxantor','Charlotte2025','OliveTreeFund','Contraryfairy','raphaelpizzaia','GotfridsGirgens','Vibenpe','thomaspj','Matt1122','B3130jim','Ollipoud','olddriller','Walladoo','bryan01993','Josephpizza','FrancescoWeber','PraguermFx','Smahmood006','josephkfoury','xCorsarz_RCV','Steady-growth','Cipino90','ChartMatthew','Analisisciclico','felipehid','calintrading','jocjohnson','AndreaMarcon16','MaxDividend','ioatri','ingruc','HappyOwlz','Aukie2008','Stranden93','a11680','DmitriiIshutin','AnnGnep','PairsageGroup','RonaldTagsuan','conjepense','Floriana1']
 
-    """
+    
     totalDivider=len(url)
     investors=[]
 
@@ -202,8 +203,8 @@ def Etoromain():
          crearNotificaciones(activityFromBD,json.dumps(datajsonUsr),cache.name)
          query = "UPDATE `inversores` SET `stocks`='" + \
            json.dumps(datajsonUsr) +"' WHERE `name`='" + id.name + "'"
-         """execute_query(connection, query)"""
-
+         execute_query(connection, query)
+        
         else:
          print("entra en insert")
 
@@ -220,7 +221,6 @@ def Etoromain():
         valores.append((a.value)/totalDivider)
         
         """print(a.name +" " + str(a.value) + " " +str(a.compradores))"""
-        
 
 
     plt.pie(valores, labels=etiquetas, autopct='%1.1f%%', startangle=90) # Utiliza la función pie() para crear el gráfico de torta
@@ -228,4 +228,4 @@ def Etoromain():
 
     # Mostrar el gráfico
     plt.show()
-Etoromain()
+    driver.close()    

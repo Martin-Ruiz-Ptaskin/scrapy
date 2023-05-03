@@ -122,21 +122,20 @@ def superInvestorsMain():
     """------------------ fingenerar notificaciones--------------"""
 
     driver = webdriver.Chrome(executable_path=r'chromedriver.exe')
-    lista=""
-    contenido = open(r"superinvestorKeyList.txt", "r")
-    previos=[]
-        
-    for línea in contenido:
-        lista=línea
-        previos=lista.split("/")
+    mycursor.execute("SELECT clave FROM `superinvestorkey`")
+    contenido=[]
+    myresultado = mycursor.fetchall()        
+    for rest in myresultado:
+        print(rest[0])
+        contenido.append(rest[0])
+    
+  
          
                 
-    contenido.close()
     driver.get('https://www.dataroma.com/m/home.php')
     hold= driver.find_element(By.ID,"port_body")
          
     lock= hold.find_elements(By.XPATH,'.//a')
-    contenido = open(r"superinvestorKeyList.txt", "w")
     toBeScraped=[]
     for u in lock: 
            url= u.get_attribute('href')
@@ -149,14 +148,15 @@ def superInvestorsMain():
            fecha=fecha[3]+"-"+out+"-"+fecha[1]
            today = date.today()
            key = fecha+name
-           contenido.write(key+"/")
-
-           if key in previos:
+           
+           
+           if key in contenido:
              print(key+"existe"+url)
            else:
             print(key+"no existe")
+            query = "INSERT INTO `superinvestorkey`(`clave`) VALUES ('" +key+"' )"
+            execute_query(connection, query)
             toBeScraped.append(urlName(name,url))
-    contenido.close()
     driver.close()
     data=[]
     for url in toBeScraped:
@@ -221,8 +221,6 @@ def superInvestorsMain():
                query = "INSERT INTO `founds`(`name`, `assets`) VALUES ('" + \
                   found.name + "','"+found.activity+"')"
                execute_query(connection, query)
-            
-
 
         
 
