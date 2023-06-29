@@ -131,7 +131,7 @@ def crearNotificaciones(ActyvityFromBD,activity,name):
 mycursor = mydb.cursor()
 
 def Etoromain():
-    driver = webdriver.Chrome(executable_path=r'chromedriver.exe')
+    driver = webdriver.Chrome(executable_path=r'C:\Users\Usuario\scrapy\chromedriver.exe')
 
     mycursor.execute("SELECT * FROM `inversores`")
     cachelist=[]

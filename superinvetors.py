@@ -121,7 +121,7 @@ def superInvestorsMain():
 
     """------------------ fingenerar notificaciones--------------"""
 
-    driver = webdriver.Chrome(executable_path=r'chromedriver.exe')
+    driver = webdriver.Chrome(executable_path=r'C:\Users\Usuario\scrapy\chromedriver.exe')
     mycursor.execute("SELECT clave FROM `superinvestorkey`")
     contenido=[]
     myresultado = mycursor.fetchall()        
@@ -160,7 +160,7 @@ def superInvestorsMain():
     driver.close()
     data=[]
     for url in toBeScraped:
-             driver = webdriver.Chrome(executable_path=r'chromedriver.exe')
+             driver = webdriver.Chrome(executable_path=r'C:\Users\Usuario\scrapy\chromedriver.exe')
              driver.get(url.url)
              hold= driver.find_element(By.ID,"grid")
             
@@ -222,7 +222,7 @@ def superInvestorsMain():
                   found.name + "','"+found.activity+"')"
                execute_query(connection, query)
 
-        
+      
 
 
 

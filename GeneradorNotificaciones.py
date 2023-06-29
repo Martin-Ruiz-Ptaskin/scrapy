@@ -9,7 +9,7 @@ sys.path.append(r'C:\Users\Usuario\scrapy\conectorsql.py')
 
 from selenium import webdriver 
 from selenium.webdriver.common.by import By
-
+import yfinance as yf
 import mysql.connector
 from mysql.connector import Error
         
@@ -76,7 +76,6 @@ for rest in myresult:
 
 """----------------------- Fin Get Assets-----------------------------"""
 def mainNoti():
-    driver = webdriver.Chrome(executable_path=r'chromedriver.exe')
 
     ActivosParaEvaluarName=[]
     ActivosParaEvaluar=[]
@@ -88,13 +87,13 @@ def mainNoti():
         if str(elemento.value).find("$"):
                  elemento.value=str(elemento.value).replace("$", "")
         if str(elemento.value).find("+"):
-                     elemento.value=str(elemento.value).replace("+", "")
-                   
+                     print("tiene +")
+                     elemento.value=elemento.value[1:]
+        print(elemento.value)
         """----------------------------"""       
         if elemento.activo in ActivosParaEvaluarName:
          for value in ActivosParaEvaluar:
 
-              print(elemento.value)
               if value.activo ==elemento.activo:
                  if len(str(value.value))>2:
                      
@@ -102,23 +101,18 @@ def mainNoti():
                 
                  if len(str(elemento.value))>2:    
                   if str(elemento.value[0])=="-" :
-                      print("es negativo")
                       elemento.value= str(elemento.value).replace("-", "")
                       value.value= int(value.value)- (-1*int(elemento.value))
                  else:
                      elemento.value=0
                      
-                 print("value")
-                 print(value.value) 
-                 print("element")
-                 print(elemento.value)
+                
                  try:
                   value.value= int(value.value)+int(elemento.value)
                  except:
                      print("err")
                  value.cantidad+=elemento.cantidad
                  value.interesados+=1
-                 print(elemento.operador)
                  value.operador+=","+elemento.operador+"[cantidad:"+str(elemento.cantidad)+",value:"+str(elemento.value)+"]"
          
         else:
@@ -133,7 +127,6 @@ def mainNoti():
             EmitirNotificacion.append(activos)
         if str(activos.value)[0]=="-" :
              activos.value= str(activos.value).replace("-", "")
-             print(activos.value +" Ver esto")
              activos.value=-1*int(activos.value)
              
         if int(activos.value) >2000000:
@@ -148,14 +141,14 @@ def mainNoti():
       else:
        print("No es el update " +noti.activo)
 
-       driver = webdriver.Chrome(executable_path=r'chromedriver.exe')
 
        query="INSERT INTO `notificaciones`( `activo`, `data`, `monto`, `interesados`) VALUES ('"+noti.activo+"','" +noti.operador +"','"+str(noti.value) +"','"+ str(noti.interesados)+"')"
        execute_query(connection, query)
       
-      driver.get('https://www.google.com/search?q='+noti.activo+'+stock&rlz=1C1CHBF_esAR1047AR1047&sxsrf=APwXEdde7_SzTvOQVk0YnM1lmenH53LvrA%3A1682299487637&ei=X9pFZPq6JsPS1sQP16GJ6A8&ved=0ahUKEwi65vb6rcH-AhVDqZUCHddQAv0Q4dUDCA8&uact=5&oq=APPL+stock&gs_lcp=Cgxnd3Mtd2l6LXNlcnAQAzIHCAAQigUQQzIHCAAQgAQQCjIHCAAQgAQQCjINCC4QrwEQxwEQgAQQCjIHCAAQgAQQCjIHCAAQgAQQCjINCC4QrwEQxwEQgAQQCjIHCAAQgAQQCjIHCAAQgAQQCjIHCAAQgAQQCjoKCAAQRxDWBBCwAzoKCAAQigUQsAMQQzoGCAAQBxAeOhAILhCKBRCxAxDHARDRAxBDOgoIIxCwAhAnEJ0COgcIABANEIAEOg0ILhANEK8BEMcBEIAEOgoIIxCxAhAnEJ0CSgQIQRgAUIgLWPEbYJAhaANwAXgAgAHAAYgB9gSSAQM1LjGYAQCgAQHIAQrAAQE&sclient=gws-wiz-serp')
-      data = driver.find_elements(By.XPATH,"//body/div[@id='main']/div[@id='cnt']/div[@id='rcnt']/div[@id='center_col']/div[@id='res']/div[@id='search']/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/g-card-section[1]/div[1]/g-card-section[1]/div[2]/div[1]/span[1]/span[1]/span[1]")[0].text
-     
-      query2="INSERT INTO `position traker`( `activo`, `precioCompra`) VALUES ('"+noti.activo+"','" +data+"')"
+      ticker_yahoo = yf.Ticker(noti.activo)
+      data = ticker_yahoo.history()
+      last_quote = data['Close'].iloc[-1]
+      print(noti.activo, last_quote)
+      query2="INSERT INTO `position traker`( `activo`, `precioCompra`) VALUES ('"+noti.activo+"','" +last_quote+"')"
       execute_query(connection, query2)
 mainNoti()

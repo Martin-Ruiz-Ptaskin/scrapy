@@ -8,10 +8,10 @@ Created on Sun Apr 23 22:46:50 2023
 import urllib.request
 import time
 from threading import Thread, Barrier
-
+import yfinance as yf
 from bs4 import BeautifulSoup
 from selenium import webdriver 
-driver = webdriver.Chrome(executable_path=r'chromedriver.exe')
+driver = webdriver.Chrome(executable_path=r'C:\Users\Usuario\scrapy\chromedriver.exe')
 from selenium.webdriver.common.by import By
 import mysql.connector
 from mysql.connector import Error
@@ -79,16 +79,19 @@ for rest in myresult:
         
 activosConPrecio=[]
 def mainPrice():
-    def func(threads,Assets):
-        driver = webdriver.Chrome(executable_path=r'chromedriver.exe')
+    
 
         for asset in Assets:
            
             
             print(asset.name)
-            driver.get('https://www.google.com/search?q='+asset.name+'+stock&rlz=1C1CHBF_esAR1047AR1047&sxsrf=APwXEdde7_SzTvOQVk0YnM1lmenH53LvrA%3A1682299487637&ei=X9pFZPq6JsPS1sQP16GJ6A8&ved=0ahUKEwi65vb6rcH-AhVDqZUCHddQAv0Q4dUDCA8&uact=5&oq=APPL+stock&gs_lcp=Cgxnd3Mtd2l6LXNlcnAQAzIHCAAQigUQQzIHCAAQgAQQCjIHCAAQgAQQCjINCC4QrwEQxwEQgAQQCjIHCAAQgAQQCjIHCAAQgAQQCjINCC4QrwEQxwEQgAQQCjIHCAAQgAQQCjIHCAAQgAQQCjIHCAAQgAQQCjoKCAAQRxDWBBCwAzoKCAAQigUQsAMQQzoGCAAQBxAeOhAILhCKBRCxAxDHARDRAxBDOgoIIxCwAhAnEJ0COgcIABANEIAEOg0ILhANEK8BEMcBEIAEOgoIIxCxAhAnEJ0CSgQIQRgAUIgLWPEbYJAhaANwAXgAgAHAAYgB9gSSAQM1LjGYAQCgAQHIAQrAAQE&sclient=gws-wiz-serp')
-            data = driver.find_elements(By.XPATH,"//body/div[@id='main']/div[@id='cnt']/div[@id='rcnt']/div[@id='center_col']/div[@id='res']/div[@id='search']/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]/div[1]/div[1]/div[3]/g-card-section[1]/div[1]/g-card-section[1]/div[2]/div[1]/span[1]/span[1]/span[1]")[0].text
-            diferencia=  (float(asset.value)-float(data))/float(asset.value)
+
+            ticker_yahoo = yf.Ticker(asset.name)
+            data = ticker_yahoo.history()
+            last_quote = data['Close'].iloc[-1]
+            print( last_quote)
+            
+            diferencia=  (float(asset.value)-float(last_quote))/float(asset.value)
             
             if diferencia>0.05:
                query2 = "UPDATE `position traker` SET `estado`='perdida'  WHERE  'activo' ='"+asset.name+"'"
@@ -97,30 +100,14 @@ def mainPrice():
               
              query2 = "UPDATE `position traker` SET `estado`='Ganada'  WHERE  'activo' ='"+asset.name+"'" 
              execute_query(connection, query2)
-            if asset.maximo< float(data):
+            if asset.maximo< float(last_quote):
                print(asset.maximo)
                print("update")
-               query2 = "UPDATE `position traker` SET `precioTop`='"+ str(float(data))+"'  WHERE  `activo`= '"+asset.name+"'" 
+               query2 = "UPDATE `position traker` SET `precioTop`='"+ str(float(last_quote))+"'  WHERE  `activo`= '"+asset.name+"'" 
 
                print(query2)
                execute_query(connection, query2) 
                
              
-        driver.close()
-    cantidad=round(len(Assets)/10)
-    barrier = Barrier(cantidad)
-    def get_sublists(original_list, number_of_sub_list_wanted):
-         sublists = list()
-         for sub_list_count in range(number_of_sub_list_wanted): 
-          sublists.append(original_list[sub_list_count::number_of_sub_list_wanted])
-         return sublists
-    url=get_sublists(Assets, cantidad)
-    threads = []
-
-    for a in url:
-         i = Thread(target=func, args=(barrier,a,))
-         i.start()
-         threads.append(i)
-
-    for i in threads:
-         i.join()
+  
+mainPrice()
