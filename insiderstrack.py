@@ -121,8 +121,8 @@ def mainInsider():
            if fill.tradetype=="S - Sale": 
                operacion="venta"
            print(operacion)
-           query2 = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento`) VALUES ('" + \
-              fill.code+ "','"+fill.insider+ "','"+fill.QTY+ "','"+fill.value+"','"+ operacion + "')"
+           query2 = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento`,`tipo_investor`) VALUES ('" + \
+              fill.code+ "','"+fill.insider+ "','"+fill.QTY+ "','"+fill.value+"','"+ operacion + "','insider' )"
            print(query2)
            execute_query(connection, query2)
 
@@ -130,4 +130,4 @@ def mainInsider():
 
     except:
       print(Error)
-
+mainInsider()

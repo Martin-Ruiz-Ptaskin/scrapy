@@ -19,12 +19,12 @@ import GeneradorNotificaciones
 import PriceStock
 while 1==1:
 
- #superinvetors.superInvestorsMain()
+ superinvetors.superInvestorsMain()
  time.sleep(5)
  insiderstrack.mainInsider()
  time.sleep(5)
 
- #maybeEtoroWin.Etoromain()
+ maybeEtoroWin.Etoromain()
  time.sleep(4)
  print("notificaciones")
  GeneradorNotificaciones.mainNoti()

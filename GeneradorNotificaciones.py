@@ -22,9 +22,9 @@ def create_db_connection(host_name, user_name, user_password, db_name):
             passwd=user_password,
             database=db_name
         )
-        print("MySQL Database connection successful")
+        ("MySQL Database connection successful")
     except Error as err:
-        print(f"Error: '{err}'")
+        (f"Error: '{err}'")
 
     return connection
 
@@ -48,18 +48,18 @@ mydb = mysql.connector.connect(
   database="scrapy"
 )
 class activoFromBd:
-    def __init__(self,activo,cantidad,operador,value,interesados):
+    def __init__(self,activo,cantidad,operador,value,interesados,tipo):
         self.activo=activo
-        self.operador = operador+"[cantidad:"+str(cantidad)+",value:"+str(value)+"]"
+        self.operador ="[operador: "+str( operador)+", cantidad:"+str(cantidad)+", value:"+str(value)+", type:"+str(tipo)+"]"
         self.cantidad=cantidad
         self.value = value
         self.interesados = interesados
-
+        self.tipo = tipo
         
 """------inicio get assets"""
 
 mycursor = mydb.cursor()
-mycursor.execute("SELECT activo FROM `position traker`")
+mycursor.execute("SELECT activo FROM `notificaciones`")
 myresult = mycursor.fetchall() 
 nombresActivos=[]
 for rest in myresult:
@@ -72,24 +72,30 @@ myresult = mycursor.fetchall()
 Assets=[]  
 for rest in myresult:
     resultados= rest[0]
-    Assets.append(activoFromBd(rest[1], rest[3], rest[2], rest[5],1))
+    Assets.append(activoFromBd(rest[1], rest[3], rest[2], rest[5],1,rest[7]))
 
+mycursor.execute("SELECT activo FROM `position traker`")
+
+myTrakedAssets = mycursor.fetchall() 
+AssetsTracked=[]  
+for rest in myTrakedAssets:
+    AssetsTracked.append(rest[0])
 """----------------------- Fin Get Assets-----------------------------"""
 def mainNoti():
 
     ActivosParaEvaluarName=[]
     ActivosParaEvaluar=[]
     EmitirNotificacion=[]
+    """INSIDER PART"""
     for elemento in Assets:
         """Remuevo caracteres molestos"""
         if str(elemento.value).find(","):
                   elemento.value=str(elemento.value).replace(",", "")
-        if str(elemento.value).find("$"):
-                 elemento.value=str(elemento.value).replace("$", "")
-        if str(elemento.value).find("+"):
-                     print("tiene +")
-                     elemento.value=elemento.value[1:]
-        print(elemento.value)
+        if str(elemento.value[0])=="-":
+                 
+                 elemento.value=str(int(elemento.value[2:])*-1)
+        else :
+                     elemento.value=int(elemento.value[2:])
         """----------------------------"""       
         if elemento.activo in ActivosParaEvaluarName:
          for value in ActivosParaEvaluar:
@@ -99,22 +105,23 @@ def mainNoti():
                      
                   value.value==0 
                 
-                 if len(str(elemento.value))>2:    
-                  if str(elemento.value[0])=="-" :
-                      elemento.value= str(elemento.value).replace("-", "")
-                      value.value= int(value.value)- (-1*int(elemento.value))
-                 else:
-                     elemento.value=0
+                 
                      
                 
                  try:
+                  
                   value.value= int(value.value)+int(elemento.value)
                  except:
                      print("err")
                  value.cantidad+=elemento.cantidad
                  value.interesados+=1
-                 value.operador+=","+elemento.operador+"[cantidad:"+str(elemento.cantidad)+",value:"+str(elemento.value)+"]"
-         
+                 print("-----------------------------------")
+                 print( value.operador)
+                 print("---------------")
+                 value.operador+=";"+str( elemento.operador)
+                 print( value.operador)
+                 print("-----------------------------------")
+
         else:
          
 
@@ -123,32 +130,39 @@ def mainNoti():
 
 
     for activos in ActivosParaEvaluar:
-        if activos.interesados>=2:
+        if activos.interesados>=2 and abs(int(activos.value)) >1000000:
             EmitirNotificacion.append(activos)
-        if str(activos.value)[0]=="-" :
-             activos.value= str(activos.value).replace("-", "")
-             activos.value=-1*int(activos.value)
+            continue
              
-        if int(activos.value) >2000000:
-           
-            EmitirNotificacion.append(activos)
-
+        
+    """INSIDER PART FIN
+    """        
     for noti in EmitirNotificacion:
+      last_quote = 0
+      try:
+           
+            ticker_yahoo = yf.Ticker(noti.activo)
+            data = ticker_yahoo.history()
+            last_quote = data['Close'].iloc[-1]
+            if noti.activo in AssetsTracked: 
+                query2 = "UPDATE `position traker` SET `precioTop`='"+ str(float(last_quote))+"'  WHERE  `activo`= '"+noti.activo+"'" 
+                execute_query(connection, query2)
+            #(noti.activo, last_quote)
+            else:
+             query2="INSERT INTO `position traker`( `activo`, `precioCompra`) VALUES ('"+noti.activo+"','" +str(last_quote)+"')"
+             execute_query(connection, query2)
+      except:
+           ("error al obtener cotizacion")
       if noti.activo in nombresActivos:
-          print("entra en el update " +noti.activo)
-          update="UPDATE  `notificaciones` SET  `data`='"+noti.operador+"', `monto`='"+ str(noti.value) +"', `interesados`='"+str(noti.interesados)+"' WHERE 'activo'='"+noti.activo+"' "
+          ("entra en el update " +noti.activo)
+          update="UPDATE  `notificaciones` SET  `data`='"+(noti.operador +"]" ) +"', `monto`='"+ str(noti.value) +"', `interesados`='"+str(noti.interesados)+"'  WHERE activo='"+noti.activo+"' "
+          (update)
           execute_query(connection, update)
       else:
-       print("No es el update " +noti.activo)
+       ("No es el update " +noti.activo)
 
 
-       query="INSERT INTO `notificaciones`( `activo`, `data`, `monto`, `interesados`) VALUES ('"+noti.activo+"','" +noti.operador +"','"+str(noti.value) +"','"+ str(noti.interesados)+"')"
+       query="INSERT INTO `notificaciones`( `activo`, `data`, `monto`, `interesados`, `Precio_int`  ) VALUES ('"+noti.activo+"','"+(noti.operador +"]" ) +"','"+str(noti.value) +"','"+ str(noti.interesados)+"','"+ str(last_quote) +"')"
        execute_query(connection, query)
-      
-      ticker_yahoo = yf.Ticker(noti.activo)
-      data = ticker_yahoo.history()
-      last_quote = data['Close'].iloc[-1]
-      print(noti.activo, last_quote)
-      query2="INSERT INTO `position traker`( `activo`, `precioCompra`) VALUES ('"+noti.activo+"','" +last_quote+"')"
-      execute_query(connection, query2)
-mainNoti()
+
+

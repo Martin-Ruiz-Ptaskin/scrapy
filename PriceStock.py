@@ -11,7 +11,6 @@ from threading import Thread, Barrier
 import yfinance as yf
 from bs4 import BeautifulSoup
 from selenium import webdriver 
-driver = webdriver.Chrome(executable_path=r'C:\Users\Usuario\scrapy\chromedriver.exe')
 from selenium.webdriver.common.by import By
 import mysql.connector
 from mysql.connector import Error
@@ -89,9 +88,13 @@ def mainPrice():
             ticker_yahoo = yf.Ticker(asset.name)
             data = ticker_yahoo.history()
             last_quote = data['Close'].iloc[-1]
-            print( last_quote)
+            print(" valor recinete")
+            print( last_quote )
+            print(" valor")
+            print(float(asset.value) )
             
             diferencia=  (float(asset.value)-float(last_quote))/float(asset.value)
+            print(diferencia)
             
             if diferencia>0.05:
                query2 = "UPDATE `position traker` SET `estado`='perdida'  WHERE  'activo' ='"+asset.name+"'"

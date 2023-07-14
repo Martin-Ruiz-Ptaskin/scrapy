@@ -98,28 +98,33 @@ def superInvestorsMain():
                    activoValue=activo['value'].replace(',', '').replace('$', '')
                    activoWebValue=activoEnWeb['value'].replace(',', '').replace('$', '')
                    monto= ((-1)*(int(activoValue)-int(activoWebValue)))
-                   print(monto , activoWebValue,activoValue)
+                   print("-----------------------")
+
+                   print(monto , " esto es monto")
                    diferencia= int(activo['cantidad'].replace(',', ''))-int(activoEnWeb['cantidad'].replace(',', ''))
+                   print(diferencia,activo['value'] ,activoEnWeb['value'])
                    if(diferencia <0):
                        print("se sompro " + str(diferencia) + activoEnWeb['name'])
-                       dif =diferencia*(-1)
-                       query = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento`) VALUES ('" + \
-                          activoEnWeb['name'] + "','"+name+ "','"+str(dif)+ "','"+str(monto)+"','compra')"
+                       dif ="+$" + str(diferencia*(-1))
+                       query = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento`,`tipo_investor`) VALUES ('" + \
+                          activoEnWeb['name'] + "','"+name+ "','"+ activoEnWeb['portfolioPart'] + "','"+ str(dif)+"','compra','fund')"
                        print(query)
                        execute_query(connection, query)
 
                    if(diferencia >0):
-                       query = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento`) VALUES ('" + \
-                          activoEnWeb['name'] + "','"+name+ "','"+str(diferencia)+ "','"+str(monto)+"','venta')"
+                       dif ="-$" + str(diferencia)
+                       print("se vendio " + str(diferencia) + activoEnWeb['name'])
+
+                       query = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento` ,`tipo_investor`) VALUES ('" + \
+                          activoEnWeb['name'] + "','"+name+ "','"+ activoEnWeb['portfolioPart']+ "','"+str(dif)+"','venta','fund' )"
                        print(query)
                        execute_query(connection, query)
-                       print("se vendio " + str(diferencia) + activoEnWeb['name'])
                    if(diferencia ==0):
                        print("nada en " + str(diferencia) +activoEnWeb['name'])
 
 
 
-    """------------------ fingenerar notificaciones--------------"""
+    """------------------ fin generar notificaciones--------------"""
 
     driver = webdriver.Chrome(executable_path=r'C:\Users\Usuario\scrapy\chromedriver.exe')
     mycursor.execute("SELECT clave FROM `superinvestorkey`")
@@ -187,7 +192,7 @@ def superInvestorsMain():
 
              data.append(fondo)
 
-
+    driver.close() 
             
          
            
@@ -211,18 +216,28 @@ def superInvestorsMain():
             if (existe == 1):
                crearNotificaciones(activityFromBD,found.activity,found.name)
                print(found.name)
+               print(found.activity)
                query = "UPDATE `founds` SET `assets`='" + \
                    found.activity +"' WHERE `name`='" + found.name + "'"
                execute_query(connection, query)
 
             else:
                print("entra en insert")
-
+            
+               actividad=json.loads(found.activity)
+               print(actividad)
+               for activoEnWeb in actividad:
+                   print("se añade ")
+                 
+                   query = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento`,`tipo_investor`) VALUES ('" + \
+                      activoEnWeb['name'] + "','"+ found.name+ "','"+ activoEnWeb['portfolioPart'] + "','+"+ activoEnWeb['value']+"','compra','fund')"
+                   print(query)
+                   execute_query(connection, query)
                query = "INSERT INTO `founds`(`name`, `assets`) VALUES ('" + \
                   found.name + "','"+found.activity+"')"
                execute_query(connection, query)
 
-      
+
 
 
 
