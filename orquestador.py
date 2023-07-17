@@ -17,6 +17,8 @@ time.sleep(2)
 import GeneradorNotificaciones
 
 import PriceStock
+
+vueltas = 0
 while 1==1:
 
  superinvetors.superInvestorsMain()
@@ -30,10 +32,11 @@ while 1==1:
  GeneradorNotificaciones.mainNoti()
  time.sleep(4)
  tiempo=0
- while tiempo <2:
+ while tiempo <1:
      print(tiempo)
      tiempo=tiempo+1
      PriceStock.mainPrice()
-     time.sleep(100)
-
+     time.sleep(800)
+ vueltas+=1
+ print("vueltas ------------------- " + str(vueltas)+ "------------------------")
 

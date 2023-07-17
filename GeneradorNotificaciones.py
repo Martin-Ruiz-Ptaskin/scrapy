@@ -89,13 +89,18 @@ def mainNoti():
     """INSIDER PART"""
     for elemento in Assets:
         """Remuevo caracteres molestos"""
-        if str(elemento.value).find(","):
+        #print(elemento.value)
+        try:
+         if str(elemento.value).find(","):
                   elemento.value=str(elemento.value).replace(",", "")
-        if str(elemento.value[0])=="-":
+         if str(elemento.value[0])=="-":
                  
                  elemento.value=str(int(elemento.value[2:])*-1)
-        else :
-                     elemento.value=int(elemento.value[2:])
+         else :
+                     elemento.value=str(elemento.value[2:])
+        except Error as err:
+            elemento.value=0
+            print(f"Error: '{err}'")
         """----------------------------"""       
         if elemento.activo in ActivosParaEvaluarName:
          for value in ActivosParaEvaluar:
@@ -113,14 +118,14 @@ def mainNoti():
                   value.value= int(value.value)+int(elemento.value)
                  except:
                      print("err")
-                 value.cantidad+=elemento.cantidad
+                 """  value.cantidad+=elemento.cantidad
                  value.interesados+=1
                  print("-----------------------------------")
                  print( value.operador)
-                 print("---------------")
+                 print("---------------")"""
                  value.operador+=";"+str( elemento.operador)
-                 print( value.operador)
-                 print("-----------------------------------")
+                 """ print( value.operador)
+                 print("-----------------------------------")"""
 
         else:
          
@@ -145,6 +150,8 @@ def mainNoti():
             data = ticker_yahoo.history()
             last_quote = data['Close'].iloc[-1]
             if noti.activo in AssetsTracked: 
+                
+                print("update amount ")
                 query2 = "UPDATE `position traker` SET `precioTop`='"+ str(float(last_quote))+"'  WHERE  `activo`= '"+noti.activo+"'" 
                 execute_query(connection, query2)
             #(noti.activo, last_quote)

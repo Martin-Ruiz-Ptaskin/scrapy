@@ -193,20 +193,20 @@ def Etoromain():
         existe=0
         activityFromBD=""
         for cache in cachelist:
-         print(cache.name)
+         #print(cache.name)
          if cache.name == id.name:
             existe = 1
             activityFromBD = cache.assets
 
         if (existe == 1):
-         print("entra en update")
+         #print("entra en update")
          crearNotificaciones(activityFromBD,json.dumps(datajsonUsr),cache.name)
          query = "UPDATE `inversores` SET `stocks`='" + \
            json.dumps(datajsonUsr) +"' WHERE `name`='" + id.name + "'"
          execute_query(connection, query)
         
         else:
-         print("entra en insert")
+         #print("entra en insert")
 
          query = "INSERT INTO `inversores`(`name`, `stocks`) VALUES ('" + \
           id.name + "','"+json.dumps(id.assets)+"')"

@@ -88,11 +88,11 @@ def mainPrice():
             ticker_yahoo = yf.Ticker(asset.name)
             data = ticker_yahoo.history()
             last_quote = data['Close'].iloc[-1]
-            print(" valor recinete")
+            """print(" valor recinete")
             print( last_quote )
             print(" valor")
             print(float(asset.value) )
-            
+            """
             diferencia=  (float(asset.value)-float(last_quote))/float(asset.value)
             print(diferencia)
             
@@ -113,4 +113,3 @@ def mainPrice():
                
              
   
-mainPrice()

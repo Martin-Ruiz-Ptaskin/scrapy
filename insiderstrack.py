@@ -83,7 +83,7 @@ def mainInsider():
        contenido=[]
        myresultado = mycursor.fetchall()        
        for rest in myresultado:
-            print(rest[0])
+            #print(rest[0])
             contenido.append(rest[0])
                 
          
@@ -96,7 +96,7 @@ def mainInsider():
            trade =fill.find_all("td")[7].getText()
            value =fill.find_all("td")[12].getText()
            qty=fill.find_all("td")[10].getText()
-           print(qty)
+           #print(qty)
            fills =filing(date,code,company,trade,cargo,value,insider,qty)
            fillings.append(fills)
       except Error as err:
@@ -111,7 +111,7 @@ def mainInsider():
            print(key+"no existe")
            query="INSERT INTO `insider`( `clave`, `name`, `company`, `amount`, `trade`, `date`) VALUES ('"+fill.company+"','" +fill.insider+"','"+fill.code +"','"+fill.value+"','"+fill.tradetype+"','"+fill.date+"')"
            execute_query(connection, query)
-           print(fill.tradetype)
+           #print(fill.tradetype)
            query = "INSERT INTO `insiderkey`(`clave`) VALUES ('" +key+"' )"
            execute_query(connection, query)
            operacion =""
@@ -120,10 +120,10 @@ def mainInsider():
                
            if fill.tradetype=="S - Sale": 
                operacion="venta"
-           print(operacion)
+           #print(operacion)
            query2 = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento`,`tipo_investor`) VALUES ('" + \
               fill.code+ "','"+fill.insider+ "','"+fill.QTY+ "','"+fill.value+"','"+ operacion + "','insider' )"
-           print(query2)
+           #print(query2)
            execute_query(connection, query2)
 
       contenido.close()

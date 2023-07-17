@@ -98,17 +98,16 @@ def superInvestorsMain():
                    activoValue=activo['value'].replace(',', '').replace('$', '')
                    activoWebValue=activoEnWeb['value'].replace(',', '').replace('$', '')
                    monto= ((-1)*(int(activoValue)-int(activoWebValue)))
-                   print("-----------------------")
+                   #print("-----------------------")
 
-                   print(monto , " esto es monto")
+                   #print(monto , " esto es monto")
                    diferencia= int(activo['cantidad'].replace(',', ''))-int(activoEnWeb['cantidad'].replace(',', ''))
-                   print(diferencia,activo['value'] ,activoEnWeb['value'])
+                  # print(diferencia,activo['value'] ,activoEnWeb['value'])
                    if(diferencia <0):
                        print("se sompro " + str(diferencia) + activoEnWeb['name'])
                        dif ="+$" + str(diferencia*(-1))
                        query = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento`,`tipo_investor`) VALUES ('" + \
                           activoEnWeb['name'] + "','"+name+ "','"+ activoEnWeb['portfolioPart'] + "','"+ str(dif)+"','compra','fund')"
-                       print(query)
                        execute_query(connection, query)
 
                    if(diferencia >0):
@@ -117,7 +116,6 @@ def superInvestorsMain():
 
                        query = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento` ,`tipo_investor`) VALUES ('" + \
                           activoEnWeb['name'] + "','"+name+ "','"+ activoEnWeb['portfolioPart']+ "','"+str(dif)+"','venta','fund' )"
-                       print(query)
                        execute_query(connection, query)
                    if(diferencia ==0):
                        print("nada en " + str(diferencia) +activoEnWeb['name'])
@@ -129,7 +127,7 @@ def superInvestorsMain():
     driver = webdriver.Chrome(executable_path=r'C:\Users\Usuario\scrapy\chromedriver.exe')
     mycursor.execute("SELECT clave FROM `superinvestorkey`")
     contenido=[]
-    myresultado = mycursor.fetchall()        
+    myresultado = mycursor.fetchall()   
     for rest in myresultado:
         print(rest[0])
         contenido.append(rest[0])
@@ -144,7 +142,7 @@ def superInvestorsMain():
     toBeScraped=[]
     for u in lock: 
            url= u.get_attribute('href')
-           print(url)
+          # print(url)
            data = u.text.split('Updated')
            name=data[0]
            """fecha= datetime.strptime(data[1], '%d %b %Y')"""
@@ -156,9 +154,10 @@ def superInvestorsMain():
            
            
            if key in contenido:
-             print(key+"existe"+url)
+            #print(key+"existe"+url)
+            """"""
            else:
-            print(key+"no existe")
+            #print(key+"no existe")
             query = "INSERT INTO `superinvestorkey`(`clave`) VALUES ('" +key+"' )"
             execute_query(connection, query)
             toBeScraped.append(urlName(name,url))
@@ -172,7 +171,7 @@ def superInvestorsMain():
              lock= hold.find_elements(By.XPATH,'.//tr')
              lock.pop(0)
              
-             print(url.name)
+             #print(url.name)
              assetlist=[]
              fondo=hedgefound(url.name, assetlist)
              for l in lock:
@@ -192,12 +191,12 @@ def superInvestorsMain():
 
              data.append(fondo)
 
-    driver.close() 
+   
             
          
            
 
-    print(len(data))
+    #print(len(data))
     if len(data)>0:
         for found in data:
             
@@ -215,29 +214,29 @@ def superInvestorsMain():
 
             if (existe == 1):
                crearNotificaciones(activityFromBD,found.activity,found.name)
-               print(found.name)
-               print(found.activity)
+               #print(found.name)
+               #print(found.activity)
                query = "UPDATE `founds` SET `assets`='" + \
                    found.activity +"' WHERE `name`='" + found.name + "'"
                execute_query(connection, query)
 
             else:
-               print("entra en insert")
+               #print("entra en insert")
             
                actividad=json.loads(found.activity)
-               print(actividad)
+               #print(actividad)
                for activoEnWeb in actividad:
-                   print("se añade ")
+                   #print("se añade ")
                  
                    query = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento`,`tipo_investor`) VALUES ('" + \
                       activoEnWeb['name'] + "','"+ found.name+ "','"+ activoEnWeb['portfolioPart'] + "','+"+ activoEnWeb['value']+"','compra','fund')"
-                   print(query)
+                   #print(query)
                    execute_query(connection, query)
                query = "INSERT INTO `founds`(`name`, `assets`) VALUES ('" + \
                   found.name + "','"+found.activity+"')"
                execute_query(connection, query)
 
-
+superInvestorsMain()
 
 
 
