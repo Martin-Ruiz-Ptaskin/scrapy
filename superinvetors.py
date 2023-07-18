@@ -53,7 +53,7 @@ def execute_query(connection, query):
     try:
         cursor.execute(query)
         connection.commit()
-        print("Query successful")
+        #print("Query successful")
     except Error as err:
         print(f"Error: '{err}'")
 """---------------------------------------------------"""
@@ -104,7 +104,7 @@ def superInvestorsMain():
                    diferencia= int(activo['cantidad'].replace(',', ''))-int(activoEnWeb['cantidad'].replace(',', ''))
                   # print(diferencia,activo['value'] ,activoEnWeb['value'])
                    if(diferencia <0):
-                       print("se sompro " + str(diferencia) + activoEnWeb['name'])
+                       #print("se sompro " + str(diferencia) + activoEnWeb['name'])
                        dif ="+$" + str(diferencia*(-1))
                        query = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento`,`tipo_investor`) VALUES ('" + \
                           activoEnWeb['name'] + "','"+name+ "','"+ activoEnWeb['portfolioPart'] + "','"+ str(dif)+"','compra','fund')"
@@ -112,13 +112,13 @@ def superInvestorsMain():
 
                    if(diferencia >0):
                        dif ="-$" + str(diferencia)
-                       print("se vendio " + str(diferencia) + activoEnWeb['name'])
+                       #print("se vendio " + str(diferencia) + activoEnWeb['name'])
 
                        query = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento` ,`tipo_investor`) VALUES ('" + \
                           activoEnWeb['name'] + "','"+name+ "','"+ activoEnWeb['portfolioPart']+ "','"+str(dif)+"','venta','fund' )"
                        execute_query(connection, query)
                    if(diferencia ==0):
-                       print("nada en " + str(diferencia) +activoEnWeb['name'])
+                       """print("nada en " + str(diferencia) +activoEnWeb['name'])"""
 
 
 
@@ -129,7 +129,7 @@ def superInvestorsMain():
     contenido=[]
     myresultado = mycursor.fetchall()   
     for rest in myresultado:
-        print(rest[0])
+        #print(rest[0])
         contenido.append(rest[0])
     
   
@@ -235,7 +235,6 @@ def superInvestorsMain():
                query = "INSERT INTO `founds`(`name`, `assets`) VALUES ('" + \
                   found.name + "','"+found.activity+"')"
                execute_query(connection, query)
-
 superInvestorsMain()
 
 

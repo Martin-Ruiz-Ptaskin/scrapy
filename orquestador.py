@@ -5,38 +5,23 @@ orquestador
 This is a temporary script file.
 """
 import time
+import os
 
-import superinvetors
-time.sleep(2)
 
-import insiderstrack
-time.sleep(2)
-
-import maybeEtoroWin
-time.sleep(2)
-import GeneradorNotificaciones
-
-import PriceStock
-
-vueltas = 0
 while 1==1:
 
- superinvetors.superInvestorsMain()
- time.sleep(5)
- insiderstrack.mainInsider()
- time.sleep(5)
-
- maybeEtoroWin.Etoromain()
- time.sleep(4)
- print("notificaciones")
- GeneradorNotificaciones.mainNoti()
- time.sleep(4)
+ vueltas=0
  tiempo=0
+ os.system('python scrapy/insiderstrack.py')
+ os.system('python scrapy/maybeEtoroWin.py')
+ os.system('python scrapy/superinvetors.py')
  while tiempo <1:
      print(tiempo)
      tiempo=tiempo+1
-     PriceStock.mainPrice()
+     
+     os.system('python scrapy/PriceStock.py')
+  
      time.sleep(800)
- vueltas+=1
+ vueltas= vueltas+1
  print("vueltas ------------------- " + str(vueltas)+ "------------------------")
 

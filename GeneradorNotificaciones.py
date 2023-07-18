@@ -37,7 +37,7 @@ def execute_query(connection, query):
     try:
         cursor.execute(query)
         connection.commit()
-        print("Query successful")
+       # print("Query successful")
     except Error as err:
         print(f"Error: '{err}'")
 """---------------------------------------------------"""
@@ -89,7 +89,7 @@ def mainNoti():
     """INSIDER PART"""
     for elemento in Assets:
         """Remuevo caracteres molestos"""
-        #print(elemento.value)
+        print(elemento.value)
         try:
          if str(elemento.value).find(","):
                   elemento.value=str(elemento.value).replace(",", "")
@@ -172,4 +172,4 @@ def mainNoti():
        query="INSERT INTO `notificaciones`( `activo`, `data`, `monto`, `interesados`, `Precio_int`  ) VALUES ('"+noti.activo+"','"+(noti.operador +"]" ) +"','"+str(noti.value) +"','"+ str(noti.interesados)+"','"+ str(last_quote) +"')"
        execute_query(connection, query)
 
-
+mainNoti()

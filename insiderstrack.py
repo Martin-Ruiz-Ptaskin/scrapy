@@ -36,7 +36,7 @@ def execute_query(connection, query):
     try:
         cursor.execute(query)
         connection.commit()
-        print("Query successful")
+        #print("Query successful")
     except Error as err:
         print(f"Error: '{err}'")
 """---------------------------------------------------"""
@@ -106,9 +106,9 @@ def mainInsider():
 
 
         if key in contenido:
-         print(key+"existe")
+         """print(key+"existe")"""
         else:
-           print(key+"no existe")
+           #print(key+"no existe")
            query="INSERT INTO `insider`( `clave`, `name`, `company`, `amount`, `trade`, `date`) VALUES ('"+fill.company+"','" +fill.insider+"','"+fill.code +"','"+fill.value+"','"+fill.tradetype+"','"+fill.date+"')"
            execute_query(connection, query)
            #print(fill.tradetype)

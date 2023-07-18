@@ -39,7 +39,7 @@ def execute_query(connection, query):
     try:
         cursor.execute(query)
         connection.commit()
-        print("Query successful")
+        #print("Query successful")
     except Error as err:
         print(f"Error: '{err}'")
 """---------------------------------------------------"""
@@ -94,7 +94,6 @@ def mainPrice():
             print(float(asset.value) )
             """
             diferencia=  (float(asset.value)-float(last_quote))/float(asset.value)
-            print(diferencia)
             
             if diferencia>0.05:
                query2 = "UPDATE `position traker` SET `estado`='perdida'  WHERE  'activo' ='"+asset.name+"'"
@@ -104,12 +103,12 @@ def mainPrice():
              query2 = "UPDATE `position traker` SET `estado`='Ganada'  WHERE  'activo' ='"+asset.name+"'" 
              execute_query(connection, query2)
             if asset.maximo< float(last_quote):
-               print(asset.maximo)
-               print("update")
+               #print(asset.maximo)
+               #print("update")
                query2 = "UPDATE `position traker` SET `precioTop`='"+ str(float(last_quote))+"'  WHERE  `activo`= '"+asset.name+"'" 
 
-               print(query2)
+               #print(query2)
                execute_query(connection, query2) 
                
-             
+mainPrice()             
   

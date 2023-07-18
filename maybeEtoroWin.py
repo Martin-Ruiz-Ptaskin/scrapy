@@ -38,7 +38,7 @@ def execute_query(connection, query):
     try:
         cursor.execute(query)
         connection.commit()
-        print("Query successful")
+        #print("Query successful")
     except Error as err:
         print(f"Error: '{err}'")
 """---------------------------------------------------"""
@@ -104,10 +104,9 @@ def crearNotificaciones(ActyvityFromBD,activity,name):
                        if existe==0 :
                           
                         assets_vendidos.append(ListaActivosInversor(activo['InstrumentID'],diferencia,0))
-                       print("activosenoperaciones")
                        query2 = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento`) VALUES ('" + \
                        activo['InstrumentID']+ "','"+name+ "','0 ','-','"+ operacion + "')"
-                       execute_query(connection, query2)
+                       #execute_query(connection, query2)
                if(diferencia >0):
                        operacion="compra"
 
@@ -119,11 +118,10 @@ def crearNotificaciones(ActyvityFromBD,activity,name):
                         
                        if existe==0 :
                          assets_comprados.append(ListaActivosInversor(activo['InstrumentID'],diferencia,0))
-                       print("activosenoperaciones")
 
                        query2 = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento`) VALUES ('" + \
-                       activo['InstrumentID']+ "','"+name+ "','0','-','"+ operacion + "')"
-                       execute_query(connection, query2)
+                       activo['InstrumentID']+ "','"+name+ "','+$0','-','"+ operacion + "')"
+                       #execute_query(connection, query2)
 
 
 
@@ -229,3 +227,4 @@ def Etoromain():
     # Mostrar el gráfico
     plt.show()
     driver.close()    
+Etoromain()
