@@ -19,9 +19,9 @@ while 1==1:
      print(tiempo)
      tiempo=tiempo+1
      
-     os.system('python scrapy/PriceStock.py')
+     #os.system('python scrapy/PriceStock.py')
   
-     time.sleep(60)
- vueltas=+ 1
+     time.sleep(5)
+ vueltas= vueltas+ 1
  print("vueltas ------------------- " + str(vueltas)+ "------------------------")
 
