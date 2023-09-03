@@ -106,16 +106,16 @@ def superInvestorsMain():
                    if(diferencia <0):
                        #print("se sompro " + str(diferencia) + activoEnWeb['name'])
                        dif ="+$" + str(diferencia*(-1))
-                       query = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento`,`tipo_investor`) VALUES ('" + \
-                          activoEnWeb['name'] + "','"+name+ "','"+ activoEnWeb['portfolioPart'] + "','"+ str(dif)+"','compra','fund')"
+                       query = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento`,`tipo_investor`,`own`) VALUES ('" + \
+                          activoEnWeb['name'] + "','"+name+ "','"+  activoEnWeb['cantidad']+ "','"+ str(dif)+"','compra','fund','"+ activoEnWeb['portfolioPart']+ "' )"
                        execute_query(connection, query)
 
                    if(diferencia >0):
                        dif ="-$" + str(diferencia)
                        #print("se vendio " + str(diferencia) + activoEnWeb['name'])
 
-                       query = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento` ,`tipo_investor`) VALUES ('" + \
-                          activoEnWeb['name'] + "','"+name+ "','"+ activoEnWeb['portfolioPart']+ "','"+str(dif)+"','venta','fund' )"
+                       query = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento` ,`tipo_investor`,own) VALUES ('" + \
+                          activoEnWeb['name'] + "','"+name+ "','"+ activoEnWeb['cantidad']+ "','"+str(dif)+"','venta','fund','"+ activoEnWeb['portfolioPart']+ "' )"
                        execute_query(connection, query)
                    if(diferencia ==0):
                        """print("nada en " + str(diferencia) +activoEnWeb['name'])"""
@@ -219,6 +219,11 @@ def superInvestorsMain():
                query = "UPDATE `founds` SET `assets`='" + \
                    found.activity +"' WHERE `name`='" + found.name + "'"
                execute_query(connection, query)
+               query = "INSERT INTO `notificaciones`(`activo`, `data`,`tipoNotificacion`,`importancia`) VALUES ('" + \
+                  found.name + "','"+str(found.activity)+"','fond',80)"
+               print(query)
+
+               execute_query(connection, query)
 
             else:
                #print("entra en insert")
@@ -226,14 +231,14 @@ def superInvestorsMain():
                actividad=json.loads(found.activity)
                #print(actividad)
                for activoEnWeb in actividad:
-                   #print("se añade ")
+                   print(activoEnWeb['cantidad'])
                  
-                   query = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento`,`tipo_investor`) VALUES ('" + \
-                      activoEnWeb['name'] + "','"+ found.name+ "','"+ activoEnWeb['portfolioPart'] + "','+"+ activoEnWeb['value']+"','compra','fund')"
+                   query = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento`,`tipo_investor`,`own`) VALUES ('" + \
+                      activoEnWeb['name'] + "','"+ found.name+ "','"+ activoEnWeb['cantidad'] + "','+"+ activoEnWeb['value']+"','compra','fund','"+ activoEnWeb['portfolioPart']+ "')"
                    #print(query)
                    execute_query(connection, query)
-               query = "INSERT INTO `founds`(`name`, `assets`) VALUES ('" + \
-                  found.name + "','"+found.activity+"')"
+               query = "INSERT INTO `notificaciones`(`activo`, `data`,`tipoNotificacion`,`importancia`) VALUES ('" + \
+                  found.name + "','"+found.activity+"','fond',80)"
                execute_query(connection, query)
 superInvestorsMain()
 

@@ -51,14 +51,14 @@ mycursor = mydb.cursor()
 
 
 class filing:
-    def __init__(self,date,code,company,tradetype,cargo,value,insider,QTY):
+    def __init__(self,date,code,company,tradetype,cargo,value,insider,QTY,own):
         self.date=date
         self.code = code
         self.company = company
         self.tradetype = tradetype
         self.title = cargo
         self.QTY = QTY
-
+        self.own = own
         self.value = value
         self.insider = insider
 
@@ -96,8 +96,9 @@ def mainInsider():
            trade =fill.find_all("td")[7].getText()
            value =fill.find_all("td")[12].getText()
            qty=fill.find_all("td")[10].getText()
-           #print(qty)
-           fills =filing(date,code,company,trade,cargo,value,insider,qty)
+           own=fill.find_all("td")[11].getText()
+           print(cargo)
+           fills =filing(date,code,company,trade,cargo,value,insider,qty,own)
            fillings.append(fills)
       except Error as err:
         print(err)
@@ -109,7 +110,7 @@ def mainInsider():
          """print(key+"existe")"""
         else:
            #print(key+"no existe")
-           query="INSERT INTO `insider`( `clave`, `name`, `company`, `amount`, `trade`, `date`) VALUES ('"+fill.company+"','" +fill.insider+"','"+fill.code +"','"+fill.value+"','"+fill.tradetype+"','"+fill.date+"')"
+           query="INSERT INTO `insider`( `clave`, `name`, `company`, `amount`, `trade`, `date`, `cantidad`, `own`,`position`) VALUES ('"+fill.company+"','" +fill.insider+"','"+fill.code +"','"+fill.value+"','"+fill.tradetype+"','"+fill.date+"','"+fill.QTY+"','"+fill.own+"','"+ fill.title + "')"
            execute_query(connection, query)
            #print(fill.tradetype)
            query = "INSERT INTO `insiderkey`(`clave`) VALUES ('" +key+"' )"
@@ -118,11 +119,11 @@ def mainInsider():
            if fill.tradetype=="P - Purchase":
                operacion="compra"
                
-           if fill.tradetype=="S - Sale": 
+           if fill.tradetype=="S - Sale" or fill.tradetype =="S - Sale+OE": 
                operacion="venta"
            #print(operacion)
-           query2 = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento`,`tipo_investor`) VALUES ('" + \
-              fill.code+ "','"+fill.insider+ "','"+fill.QTY+ "','"+fill.value+"','"+ operacion + "','insider' )"
+           query2 = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento`,`tipo_investor`,`own`,`position`) VALUES ('" + \
+              fill.code+ "','"+fill.insider+ "','"+fill.QTY+ "','"+fill.value+"','"+ operacion + "','insider','"+ fill.own + "','"+ fill.title + "' )"
            #print(query2)
            execute_query(connection, query2)
 

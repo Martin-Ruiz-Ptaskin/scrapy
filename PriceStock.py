@@ -78,7 +78,7 @@ for rest in myresult:
         
 activosConPrecio=[]
 def mainPrice():
-    
+     
 
         for asset in Assets:
            
