@@ -10,6 +10,8 @@ function formatMessage(data,activo){
             Message += `Cantidad: ${activity.cantidad} acciones\n`;
             Message += `Monto: ${activity.value}\n`;
             Message += `tenencia: %${activity.own} \n`;
+            Message += `Fecha: ${activity.fecha} \n`;
+
         }
         if(activity.type=="insider"){
             Message += `Nombre: ${activity.operador}\n`;
@@ -17,6 +19,8 @@ function formatMessage(data,activo){
             Message += `Cantidad: ${activity.cantidad} acciones\n`;
             Message += `Monto: ${activity.value}\n`;
             Message += `Movimiento: ${activity.own}\n `;
+            Message += `Fecha: ${activity.fecha} \n`;
+
         }
       
         Message += '------\n';

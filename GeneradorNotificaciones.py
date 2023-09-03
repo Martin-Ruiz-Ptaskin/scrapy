@@ -49,11 +49,11 @@ mydb = mysql.connector.connect(
   database="scrapy"
 )
 class activoFromBd:
-    def __init__(self,idOp,activo,cantidad,operador,value,interesados,tipo,position,own,bigsell,idList):
+    def __init__(self,idOp,activo,cantidad,operador,value,interesados,tipo,position,own,bigsell,idList,fecha):
         self.activo=activo
         self.idOp=idOp
 
-        self.operador ='{"operador": "'+str( operador)+'", "cantidad":"'+str(cantidad)+'", "value":"'+str(value)+'", "type":"'+str(tipo)+'", "cargo":"'+str(position)+'", "own":"'+str(own)+'"}'
+        self.operador ='{"operador": "'+str( operador)+'", "cantidad":"'+str(cantidad)+'", "value":"'+str(value)+'", "type":"'+str(tipo)+'", "cargo":"'+str(position)+'", "own":"'+str(own)+'", "fecha":"'+str(fecha)+'"}'
         self.cantidad=cantidad
         self.value = value
         self.interesados = interesados
@@ -62,6 +62,7 @@ class activoFromBd:
         self.own = own
         self.bigsell=bigsell
         self.idList=[idOp]
+        self.fecha=[fecha]
         
 class notificacionesExistentes:
     def __init__(self,activo,idList):
@@ -84,7 +85,7 @@ myresult = mycursor.fetchall()
 Assets=[]  
 for rest in myresult:
     resultados= rest[0]
-    Assets.append(activoFromBd(rest[0],rest[1], rest[3], rest[2], rest[5],1,rest[7],rest[9],rest[8],0,[]))
+    Assets.append(activoFromBd(rest[0],rest[1], rest[3], rest[2], rest[5],1,rest[7],rest[9],rest[8],0,[],rest[4]))
 
 mycursor.execute("SELECT activo FROM `position traker`")
 
