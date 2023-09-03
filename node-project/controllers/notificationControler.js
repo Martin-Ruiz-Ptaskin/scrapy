@@ -57,7 +57,7 @@ connection.connect((err) => {
   async function sendNotificaciones(req, res) {
     return new Promise((resolve, reject) => {
       const query =
-        'SELECT *FROM notificaciones WHERE id = (SELECT id FROM notificaciones WHERE usado = 0 AND Importancia = (SELECT MAX(Importancia) FROM notificaciones WHERE usado = 0));';
+        'SELECT *FROM notificaciones WHERE id = (SELECT id FROM notificaciones WHERE usado = 0 AND Importancia = (SELECT MAX(Importancia) FROM notificaciones WHERE usado = 0 limit 1)) limit 1;';
       
       connection.query(query, (err, results) => {
         if (err) {
@@ -68,9 +68,9 @@ connection.connect((err) => {
         if(results.length==0) resolve("nada que mostrar");
         else{
           const notificaciones = results;
-          console.log(notificaciones[0].id)
           const notidata = JSON.parse(notificaciones[0].data);
-          const test = NotificacionesService.formatMessage(notidata, notificaciones[0].activo);
+
+          const test = NotificacionesService.formatMessage(notidata, notificaciones[0].activo,notificaciones[0].tipoNotificacion);
           updateNotificaciones(notificaciones[0].id);
           
           bot.sendMessage(1914457326, test);
