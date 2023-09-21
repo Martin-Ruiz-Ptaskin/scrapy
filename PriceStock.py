@@ -59,18 +59,19 @@ class activoFromBd:
 
 """Clases"""
 class activo:
-    def __init__(self,name,value,maximo):
+    def __init__(self,name,value,maximo,minimo):
         self.name=name
         self.value = value
         self.maximo = maximo
+        self.minimo = minimo
 
 """-----------------------Get Assets-----------------------------"""
 mycursor = mydb.cursor()
-mycursor.execute("SELECT DISTINCT activo ,precioCompra,precioTop FROM `position traker`")
+mycursor.execute("SELECT DISTINCT activo ,precioCompra,precioTop,precioMin FROM `position traker`")
 myresult = mycursor.fetchall() 
 Assets=[]  
 for rest in myresult:
-    Assets.append(activo(rest[0],rest[1],rest[2]) )
+    Assets.append(activo(rest[0],rest[1],rest[2],rest[3]) )
 
 """----------------------- Fin Get Assets-----------------------------"""
 
@@ -106,9 +107,14 @@ def mainPrice():
                #print(asset.maximo)
                #print("update")
                query2 = "UPDATE `position traker` SET `precioTop`='"+ str(float(last_quote))+"'  WHERE  `activo`= '"+asset.name+"'" 
-
-               #print(query2)
                execute_query(connection, query2) 
+            if asset.minimo> float(last_quote):
+                #print(asset.maximo)
+                #print("update")
+                query2 = "UPDATE `position traker` SET `precioMIn`='"+ str(float(last_quote))+"'  WHERE  `activo`= '"+asset.name+"'" 
+                execute_query(connection, query2) 
+               #print(query2)
+               
                
 mainPrice()             
   

@@ -1,7 +1,7 @@
 
 
-function formatMessage(data,activo,tipoNotificacion){
-   console.log(data)
+function formatMessage(data,activo,tipoNotificacion,notificaciones){
+   console.log(notificaciones)
    let Message=''
     if(tipoNotificacion=='fond'){
         Message += 'Fondo de inversión ACTIVITY\n-----------------------\n';
@@ -17,13 +17,14 @@ function formatMessage(data,activo,tipoNotificacion){
                 Message += `Cantidad: ${activity.cantidad} acciones\n`;
                 Message += '------\n';
             })
-            console.log(Message)
+            
             return Message
 
     }
     if(tipoNotificacion=='Insider'){
         let Message = 'INSIDER ACTIVITY\n-----------------------\n';
         Message += `Empresa: ${activo}\n-----------------------\n`;
+        Message += `Cotizaciòn: ${parseInt(parseFloat(notificaciones.Precio_int))}\n-----------------------\n`;
         data.forEach((activity) => {
             if(activity.type=="fund"){
                 Message += `fondo : ${activity.operador}\n`;

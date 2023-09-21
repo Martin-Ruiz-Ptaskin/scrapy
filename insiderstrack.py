@@ -97,23 +97,22 @@ def mainInsider():
            value =fill.find_all("td")[12].getText()
            qty=fill.find_all("td")[10].getText()
            own=fill.find_all("td")[11].getText()
-           print(cargo)
            fills =filing(date,code,company,trade,cargo,value,insider,qty,own)
            fillings.append(fills)
       except Error as err:
         print(err)
       for fill in fillings:
-        key= fill.insider+fill.value+fill.date 
+        key= str(fill.insider+fill.value+fill.date).replace("'", "")
 
 
         if key in contenido:
-         """print(key+"existe")"""
+         print(key+"existe")
         else:
            #print(key+"no existe")
-           query="INSERT INTO `insider`( `clave`, `name`, `company`, `amount`, `trade`, `date`, `cantidad`, `own`,`position`) VALUES ('"+fill.company+"','" +fill.insider+"','"+fill.code +"','"+fill.value+"','"+fill.tradetype+"','"+fill.date+"','"+fill.QTY+"','"+fill.own+"','"+ fill.title + "')"
+           query="INSERT INTO `insider`( `clave`, `name`, `company`, `amount`, `trade`, `date`, `cantidad`, `own`,`position`) VALUES ('"+fill.company+"','" +str(fill.insider).replace("'", "")+"','"+fill.code +"','"+fill.value+"','"+fill.tradetype+"','"+fill.date+"','"+fill.QTY+"','"+fill.own+"','"+ fill.title + "')"
            execute_query(connection, query)
            #print(fill.tradetype)
-           query = "INSERT INTO `insiderkey`(`clave`) VALUES ('" +key+"' )"
+           query = "INSERT INTO `insiderkey`(`clave`) VALUES ('" +str(key).replace("'", "")+"' )"
            execute_query(connection, query)
            operacion =""
            if fill.tradetype=="P - Purchase":
@@ -123,11 +122,11 @@ def mainInsider():
                operacion="venta"
            #print(operacion)
            query2 = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento`,`tipo_investor`,`own`,`position`) VALUES ('" + \
-              fill.code+ "','"+fill.insider+ "','"+fill.QTY+ "','"+fill.value+"','"+ operacion + "','insider','"+ fill.own + "','"+ fill.title + "' )"
+              fill.code+ "','"+str(fill.insider).replace("'", "")+ "','"+fill.QTY+ "','"+fill.value+"','"+ operacion + "','insider','"+ fill.own + "','"+ fill.title + "' )"
            #print(query2)
            execute_query(connection, query2)
 
-      contenido.close()
+      
 
     except:
       print(Error)

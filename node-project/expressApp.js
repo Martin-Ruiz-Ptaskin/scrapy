@@ -19,3 +19,10 @@ app.get('/', function (req, res,bot) { // creo el servicio y mapeo la peticion /
 });
  
 })
+app.get('/alive', function (req, res,bot) { // creo el servicio y mapeo la peticion /
+miFunciones.alive()
+  res.write("Bien")
+  res.end()
+
+
+})

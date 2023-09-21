@@ -104,10 +104,12 @@ def mainNoti():
         """Remuevo caracteres molestos"""
         try:
         
-       
+             
              if elemento.own and str(elemento.own).find("%"):
                          if elemento.own != "New":
-                          elemento.own= abs(int(float((str(elemento.own).replace("%", "")))))
+                        
+                          elemento.own= abs(int(float((str(elemento.own).replace("%", "").replace(">", "")))))
+                       
              if str(elemento.value).find(","):
                       elemento.value=str(elemento.value).replace(",", "")
              if str(elemento.value[0])=="-":
@@ -137,7 +139,6 @@ def mainNoti():
 
                   if value.tipo != "fund":
                    value.value= int(value.value)+int(elemento.value)
-                   print(elemento.own)
 
                   if(elemento.own >25):
                       value.bigsell=+1
@@ -228,11 +229,11 @@ def mainNoti():
             if  noti.activo in AssetsTracked: 
                 
                 print("update amount ")
-                query2 = "UPDATE `position traker` SET `precioTop`='"+ str(float(last_quote))+"'  WHERE  `activo`= '"+noti.activo+"'" 
+                query2 = "UPDATE `position traker` SET `precioTop`='"+ str(float(last_quote))+"' `precioMin`='"+ str(float(last_quote))+"'  WHERE  `activo`= '"+noti.activo+"'" 
                 execute_query(connection, query2)
             #(noti.activo, last_quote)
             else:
-             query2="INSERT INTO `position traker`( `activo`, `precioCompra`) VALUES ('"+noti.activo+"','" +str(last_quote)+"')"
+             query2="INSERT INTO `position traker`( `activo`, `precioCompra`, `precioTop`, `precioMin`) VALUES ('"+noti.activo+"','" +str(last_quote)+"','" +str(last_quote)+"','" +str(last_quote)+"')"
              execute_query(connection, query2)
      
             ("error al obtener cotizacion")
