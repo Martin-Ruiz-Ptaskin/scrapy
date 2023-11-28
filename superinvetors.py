@@ -15,11 +15,12 @@ from mysql.connector import Error
 from selenium.webdriver.common.by import By
 
 class assetsFromFound:
-    def __init__(self,name,portfolioPart,value,cantidad):
+    def __init__(self,name,portfolioPart,value,cantidad,movimiento):
         self.name=name
         self.portfolioPart = portfolioPart
         self.value = value
         self.cantidad=cantidad
+        self.movimiento=movimiento
 class hedgefound:
     def __init__(self,name,activity):
         self.name=name
@@ -184,7 +185,7 @@ def superInvestorsMain():
                  activity=name[3].text
                  cantidad=name[4].text
                
-                 hedge=assetsFromFound(asset,porcentaje,value,cantidad)
+                 hedge=assetsFromFound(asset,porcentaje,value,cantidad,activity)
                  assetlist.append(hedge)
              driver.close()  
              fondo.activity=json.dumps(assetlist, default=lambda o: o.__dict__ )
@@ -199,7 +200,7 @@ def superInvestorsMain():
     #print(len(data))
     if len(data)>0:
         for found in data:
-            
+            print("entra1")
             existe = 0
             activityFromBD =""
             
@@ -213,6 +214,7 @@ def superInvestorsMain():
                               activityFromBD = cache.activity
 
             if (existe == 1):
+               print("entra2")
                crearNotificaciones(activityFromBD,found.activity,found.name)
                #print(found.name)
                #print(found.activity)
@@ -222,12 +224,15 @@ def superInvestorsMain():
                query = "INSERT INTO `notificaciones`(`activo`, `data`,`tipoNotificacion`,`importancia`) VALUES ('" + \
                   found.name + "','"+str(found.activity)+"','fond',80)"
                print(query)
-
                execute_query(connection, query)
 
             else:
-               #print("entra en insert")
-            
+               print("entra en insert")
+               query = "INSERT INTO `founds`(`name`, `assets`) VALUES ('" + \
+                  found.name + "','"+str(found.activity)+"')"
+               print(query)
+               execute_query(connection, query)
+
                actividad=json.loads(found.activity)
                #print(actividad)
                for activoEnWeb in actividad:

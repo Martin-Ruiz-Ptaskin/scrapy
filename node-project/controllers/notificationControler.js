@@ -57,7 +57,7 @@ connection.connect((err) => {
   async function sendNotificaciones(req, res) {
     return new Promise((resolve, reject) => {
       const query =
-        'SELECT * FROM notificaciones WHERE Importancia = (SELECT MAX(Importancia) FROM notificaciones WHERE usado != 1) LIMIT 1';
+        'SELECT *FROM notificaciones WHERE id = (SELECT id FROM notificaciones WHERE usado = 0 AND Importancia = (SELECT MAX(Importancia) FROM notificaciones WHERE usado = 0 LIMIT 1)LIMIT 1) LIMIT 1;';
       
       connection.query(query, (err, results) => {
         if (err) {
@@ -69,15 +69,20 @@ connection.connect((err) => {
         else{
           const notificaciones = results;
           const notidata = JSON.parse(notificaciones[0].data);
-          const test = NotificacionesService.formatMessage(notidata, notificaciones[0].activo);
-          updateNotificaciones(notificaciones[0].activo);
+
+          const test = NotificacionesService.formatMessage(notidata, notificaciones[0].activo,notificaciones[0].tipoNotificacion,notificaciones[0]);
+          updateNotificaciones(notificaciones[0].id);
           
-          bot.sendMessage(1914457326, test);
+          bot.sendMessage(-1001757976417, test);
           resolve(notidata);
         }
        
       });
     });
+  }
+  function alive(){
+    bot.sendMessage(1914457326, "sigue vivo");
+
   }
   // UPDATE NOTIFICACIONES
   function updateNotificaciones(id){ 
@@ -98,6 +103,6 @@ connection.query(query, [updateData, id], (err, results) => {
 
   // FIN UPDATE  NOTIFICACIONES
   module.exports = {
-    sendNotificaciones,updateNotificaciones
+    sendNotificaciones,updateNotificaciones,alive
    
   };

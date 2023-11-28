@@ -6,6 +6,7 @@ Created on Mon Apr 24 00:00:21 2023
 """
 import sys
 sys.path.append(r'C:\Users\Usuario\scrapy\conectorsql.py')
+from datetime import datetime, timedelta
 
 from selenium import webdriver 
 from selenium.webdriver.common.by import By
@@ -49,11 +50,11 @@ mydb = mysql.connector.connect(
   database="scrapy"
 )
 class activoFromBd:
-    def __init__(self,idOp,activo,cantidad,operador,value,interesados,tipo,position,own,bigsell,idList):
+    def __init__(self,idOp,activo,cantidad,operador,value,interesados,tipo,position,own,bigsell,idList,fecha):
         self.activo=activo
         self.idOp=idOp
 
-        self.operador ='{"operador": "'+str( operador)+'", "cantidad":"'+str(cantidad)+'", "value":"'+str(value)+'", "type":"'+str(tipo)+'", "cargo":"'+str(position)+'", "own":"'+str(own)+'"}'
+        self.operador ='{"operador": "'+str( operador)+'", "cantidad":"'+str(cantidad)+'", "value":"'+str(value)+'", "type":"'+str(tipo)+'", "cargo":"'+str(position)+'", "own":"'+str(own)+'", "fecha":"'+str(fecha)+'"}'
         self.cantidad=cantidad
         self.value = value
         self.interesados = interesados
@@ -62,6 +63,7 @@ class activoFromBd:
         self.own = own
         self.bigsell=bigsell
         self.idList=[idOp]
+        self.fecha=[fecha]
         
 class notificacionesExistentes:
     def __init__(self,activo,idList):
@@ -77,14 +79,21 @@ nombresActivos=[]
 for rest in myresult:
     
     nombresActivos.append(notificacionesExistentes(rest[0],rest[1]))
-    
-mycursor.execute("SELECT * FROM `activosenoperaciones`")
+fecha_actual = datetime.now()
+
+# Restar un mes
+fecha_mes_pasado = fecha_actual - timedelta(days=60)  # Se asume que un mes tiene aproximadamente 30 días
+
+# Formatear la fecha en el formato deseado
+fecha_formateada = fecha_mes_pasado.strftime("%Y-%m-%d")   
+mycursor.execute("SELECT *FROM `activosenoperaciones` WHERE `fecha` >="+fecha_formateada+"")
+print("SELECT *FROM `activosenoperaciones` WHERE `fecha` >`"+fecha_formateada+"`")
 
 myresult = mycursor.fetchall() 
 Assets=[]  
 for rest in myresult:
     resultados= rest[0]
-    Assets.append(activoFromBd(rest[0],rest[1], rest[3], rest[2], rest[5],1,rest[7],rest[9],rest[8],0,[]))
+    Assets.append(activoFromBd(rest[0],rest[1], rest[3], rest[2], rest[5],1,rest[7],rest[9],rest[8],0,[],rest[4]))
 
 mycursor.execute("SELECT activo FROM `position traker`")
 
@@ -103,10 +112,12 @@ def mainNoti():
         """Remuevo caracteres molestos"""
         try:
         
-       
+             
              if elemento.own and str(elemento.own).find("%"):
                          if elemento.own != "New":
-                          elemento.own= abs(int(float((str(elemento.own).replace("%", "")))))
+                        
+                          elemento.own= abs(int(float((str(elemento.own).replace("%", "").replace(">", "")))))
+                       
              if str(elemento.value).find(","):
                       elemento.value=str(elemento.value).replace(",", "")
              if str(elemento.value[0])=="-":
@@ -136,7 +147,6 @@ def mainNoti():
 
                   if value.tipo != "fund":
                    value.value= int(value.value)+int(elemento.value)
-                   print(elemento.own)
 
                   if(elemento.own >25):
                       value.bigsell=+1
@@ -198,12 +208,13 @@ def mainNoti():
                 
              fechaEconomica=EconomicCalendar.calendarUpdate(noti.activo)
              ticker_yahoo = yf.Ticker(noti.activo)
+             print(ticker_yahoo)
 
              print(fechaEconomica)
-
+             data = ticker_yahoo.history()
             except:
                 print("err al obtener fecha economica")
-            data = ticker_yahoo.history()
+            
             last_quote = data['Close'].iloc[-1]
             BigSellMultiplication=1
             fechaEconimocaMultipliation=1
@@ -227,11 +238,13 @@ def mainNoti():
             if  noti.activo in AssetsTracked: 
                 
                 print("update amount ")
-                query2 = "UPDATE `position traker` SET `precioTop`='"+ str(float(last_quote))+"'  WHERE  `activo`= '"+noti.activo+"'" 
+                query2 = "UPDATE `position traker` SET `precioTop`='"+ str(float(last_quote))+"', precioMin='"+ str(float(last_quote))+"'  WHERE  `activo`= '"+noti.activo+"'" 
+                print(query2)
+
                 execute_query(connection, query2)
             #(noti.activo, last_quote)
             else:
-             query2="INSERT INTO `position traker`( `activo`, `precioCompra`) VALUES ('"+noti.activo+"','" +str(last_quote)+"')"
+             query2="INSERT INTO `position traker`( `activo`, `precioCompra`, `precioTop`, `precioMin`) VALUES ('"+noti.activo+"','" +str(last_quote)+"','" +str(last_quote)+"','" +str(last_quote)+"')"
              execute_query(connection, query2)
      
             ("error al obtener cotizacion")
