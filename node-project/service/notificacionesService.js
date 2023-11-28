@@ -24,7 +24,7 @@ function formatMessage(data,activo,tipoNotificacion,notificaciones){
     if(tipoNotificacion=='Insider'){
         let Message = 'INSIDER ACTIVITY\n-----------------------\n';
         Message += `Empresa: ${activo}\n-----------------------\n`;
-        Message += `Cotizaciòn: ${parseInt(parseFloat(notificaciones.Precio_int))}\n-----------------------\n`;
+        Message += `Cotizaciòn: ${parseFloat(notificaciones.Precio_int)}\n-----------------------\n`;
         data.forEach((activity) => {
             if(activity.type=="fund"){
                 Message += `fondo : ${activity.operador}\n`;

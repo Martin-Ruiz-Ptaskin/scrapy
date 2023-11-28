@@ -6,6 +6,7 @@ Created on Mon Apr 24 00:00:21 2023
 """
 import sys
 sys.path.append(r'C:\Users\Usuario\scrapy\conectorsql.py')
+from datetime import datetime, timedelta
 
 from selenium import webdriver 
 from selenium.webdriver.common.by import By
@@ -78,8 +79,15 @@ nombresActivos=[]
 for rest in myresult:
     
     nombresActivos.append(notificacionesExistentes(rest[0],rest[1]))
-    
-mycursor.execute("SELECT * FROM `activosenoperaciones`")
+fecha_actual = datetime.now()
+
+# Restar un mes
+fecha_mes_pasado = fecha_actual - timedelta(days=60)  # Se asume que un mes tiene aproximadamente 30 días
+
+# Formatear la fecha en el formato deseado
+fecha_formateada = fecha_mes_pasado.strftime("%Y-%m-%d")   
+mycursor.execute("SELECT *FROM `activosenoperaciones` WHERE `fecha` >="+fecha_formateada+"")
+print("SELECT *FROM `activosenoperaciones` WHERE `fecha` >`"+fecha_formateada+"`")
 
 myresult = mycursor.fetchall() 
 Assets=[]  
@@ -200,12 +208,13 @@ def mainNoti():
                 
              fechaEconomica=EconomicCalendar.calendarUpdate(noti.activo)
              ticker_yahoo = yf.Ticker(noti.activo)
+             print(ticker_yahoo)
 
              print(fechaEconomica)
-
+             data = ticker_yahoo.history()
             except:
                 print("err al obtener fecha economica")
-            data = ticker_yahoo.history()
+            
             last_quote = data['Close'].iloc[-1]
             BigSellMultiplication=1
             fechaEconimocaMultipliation=1
@@ -229,7 +238,9 @@ def mainNoti():
             if  noti.activo in AssetsTracked: 
                 
                 print("update amount ")
-                query2 = "UPDATE `position traker` SET `precioTop`='"+ str(float(last_quote))+"' `precioMin`='"+ str(float(last_quote))+"'  WHERE  `activo`= '"+noti.activo+"'" 
+                query2 = "UPDATE `position traker` SET `precioTop`='"+ str(float(last_quote))+"', precioMin='"+ str(float(last_quote))+"'  WHERE  `activo`= '"+noti.activo+"'" 
+                print(query2)
+
                 execute_query(connection, query2)
             #(noti.activo, last_quote)
             else:
