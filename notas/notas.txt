@@ -1,0 +1,7 @@
+obtner nombres de activos https://api.etorostatic.com/sapi/instrumentsmetadata/V1.1/instruments/bulk?bulkNumber=1&cv=2e55718c9eb4e6c6e66008e88f0adf7a_1f8f66afa7d0d88dfa6a30e657e6c40a&totalBulks=1
+InstrumentID
+: 1005
+
+PRECIOS
+
+https://api.etorostatic.com/sapi/candles/closingprices.json?cv=2679181eacb94174273960facfcac4c8_acaacaf19d0c11e0b5936698f216eb94

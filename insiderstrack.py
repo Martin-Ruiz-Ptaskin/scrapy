@@ -8,46 +8,8 @@ Created on Tue Oct 18 15:06:30 2022
 import urllib.request
 import time
 from bs4 import BeautifulSoup
-import mysql.connector
-from mysql.connector import Error
-"""---------------------------------------------------"""
-        
-def create_db_connection(host_name, user_name, user_password, db_name):
-    connection = None
-    try:
-        connection = mysql.connector.connect(
-            host=host_name,
-            user=user_name,
-            passwd=user_password,
-            database=db_name
-        )   
-        print("MySQL Database connection successful")
-    except Error as err:
-        print(f"Error: '{err}'")
-
-    return connection
-
-"""---------------------------------------------------"""
-
-connection = create_db_connection("localhost", "root", "", "scrapy")
-
-def execute_query(connection, query):
-    cursor = connection.cursor()
-    try:
-        cursor.execute(query)
-        connection.commit()
-        #print("Query successful")
-    except Error as err:
-        print(f"Error: '{err}'")
-"""---------------------------------------------------"""
-mydb = mysql.connector.connect(
-  host="localhost",
-  user="root",
-  password="",
-  database="scrapy"
-)
-
-mycursor = mydb.cursor()
+import DBconection as BD
+mycursor = BD.mydb.cursor()
 
 
 class filing:
@@ -99,7 +61,7 @@ def mainInsider():
            own=fill.find_all("td")[11].getText()
            fills =filing(date,code,company,trade,cargo,value,insider,qty,own)
            fillings.append(fills)
-      except Error as err:
+      except BD.Error as err:
         print(err)
       for fill in fillings:
         key= str(fill.insider+fill.value+fill.date).replace("'", "")
@@ -110,10 +72,10 @@ def mainInsider():
         else:
            #print(key+"no existe")
            query="INSERT INTO `insider`( `clave`, `name`, `company`, `amount`, `trade`, `date`, `cantidad`, `own`,`position`) VALUES ('"+fill.company+"','" +str(fill.insider).replace("'", "")+"','"+fill.code +"','"+fill.value+"','"+fill.tradetype+"','"+fill.date+"','"+fill.QTY+"','"+fill.own+"','"+ fill.title + "')"
-           execute_query(connection, query)
+           BD.execute_query(BD.connection, query)
            #print(fill.tradetype)
            query = "INSERT INTO `insiderkey`(`clave`) VALUES ('" +str(key).replace("'", "")+"' )"
-           execute_query(connection, query)
+           BD.execute_query(BD.connection, query)
            operacion =""
            if fill.tradetype=="P - Purchase":
                operacion="compra"
@@ -124,10 +86,10 @@ def mainInsider():
            query2 = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento`,`tipo_investor`,`own`,`position`) VALUES ('" + \
               fill.code+ "','"+str(fill.insider).replace("'", "")+ "','"+fill.QTY+ "','"+fill.value+"','"+ operacion + "','insider','"+ fill.own + "','"+ fill.title + "' )"
            #print(query2)
-           execute_query(connection, query2)
+           BD.execute_query(BD.connection, query2)
 
       
 
     except:
-      print(Error)
+      print(BD.Error)
 mainInsider()

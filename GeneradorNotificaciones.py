@@ -11,44 +11,10 @@ from datetime import datetime, timedelta
 from selenium import webdriver 
 from selenium.webdriver.common.by import By
 import yfinance as yf
-import mysql.connector
-from mysql.connector import Error
+import DBconection as BD
 import EconomicCalendar
         
-def create_db_connection(host_name, user_name, user_password, db_name):
-    connection = None
-    try:
-        connection = mysql.connector.connect(
-            host=host_name,
-            user=user_name,
-            passwd=user_password,
-            database=db_name
-        )
-        ("MySQL Database connection successful")
-    except Error as err:
-        (f"Error: '{err}'")
 
-    return connection
-
-"""---------------------------------------------------"""
-
-connection = create_db_connection("localhost", "root", "", "scrapy")
-
-def execute_query(connection, query):
-    cursor = connection.cursor()
-    try:
-        cursor.execute(query)
-        connection.commit()
-       # print("Query successful")
-    except Error as err:
-        print(f"Error: '{err}'")
-"""---------------------------------------------------"""
-mydb = mysql.connector.connect(
-  host="localhost",
-  user="root",
-  password="",
-  database="scrapy"
-)
 class activoFromBd:
     def __init__(self,idOp,activo,cantidad,operador,value,interesados,tipo,position,own,bigsell,idList,fecha):
         self.activo=activo
@@ -72,7 +38,7 @@ class notificacionesExistentes:
        
 """------inicio get assets"""
 
-mycursor = mydb.cursor()
+mycursor = BD.mydb.cursor()
 mycursor.execute("SELECT activo,relatedActivosEnOperacion FROM `notificaciones` where tipoNotificacion='Insider' " )
 myresult = mycursor.fetchall() 
 nombresActivos=[]
@@ -126,7 +92,7 @@ def mainNoti():
              else :
                          elemento.value=str(elemento.value[2:])
          
-        except Error as err:
+        except BD.Error as err:
             elemento.value=0
             print(err)
         """----------------------------"""       
@@ -241,21 +207,21 @@ def mainNoti():
                 query2 = "UPDATE `position traker` SET `precioTop`='"+ str(float(last_quote))+"', precioMin='"+ str(float(last_quote))+"'  WHERE  `activo`= '"+noti.activo+"'" 
                 print(query2)
 
-                execute_query(connection, query2)
+                BD.execute_query(BD.connection, query2)
             #(noti.activo, last_quote)
             else:
              query2="INSERT INTO `position traker`( `activo`, `precioCompra`, `precioTop`, `precioMin`) VALUES ('"+noti.activo+"','" +str(last_quote)+"','" +str(last_quote)+"','" +str(last_quote)+"')"
-             execute_query(connection, query2)
+             BD.execute_query(BD.connection, query2)
      
             ("error al obtener cotizacion")
             if existe==1:
              ("deberia entrar en el update " +noti.activo)
              update="UPDATE  `notificaciones` SET  `data`='"+("["+noti.operador +"]" ) +"', `monto`='"+ str(noti.value) +"', `relatedActivosEnOperacion`='"+ str(noti.idList) +"',`interesados`='"+str(noti.interesados)+"' , `Importancia`='"+str(importancia)+"' , `ExtraData`='"+str(fechaEconomica)+"', `usado`=0    WHERE activo='"+noti.activo+"' "
               
-             execute_query(connection, update)
+             BD.execute_query(BD.connection, update)
             else:
              print("No es el update " +noti.activo)
              query="INSERT INTO `notificaciones`( `activo`, `data`, `monto`, `interesados`, `Precio_int`, `tipoNotificacion`,`importancia` ,`ExtraData`,`relatedActivosEnOperacion`   ) VALUES ('"+noti.activo+"','"+("["+noti.operador +"]" ) +"','"+str(noti.value) +"','"+ str(noti.interesados)+"','"+ str(last_quote) +"','Insider','"+ str(importancia) +"','"+ str(fechaEconomica) +"','"+ str(noti.idList) +"')"
-             execute_query(connection, query)
+             BD.execute_query(BD.connection, query)
 
 mainNoti()

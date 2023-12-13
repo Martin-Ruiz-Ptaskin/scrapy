@@ -8,48 +8,14 @@ Created on Fri Aug  4 18:47:59 2023
 @author: Usuario
 """
 
-import mysql.connector
-from mysql.connector import Error
+import DBconection as BD
 
-def create_db_connection(host_name, user_name, user_password, db_name):
-    connection = None
-    try:
-        connection = mysql.connector.connect(
-            host=host_name,
-            user=user_name,
-            passwd=user_password,
-            database=db_name
-        )
-        ("MySQL Database connection successful")
-    except Error as err:
-        (f"Error: '{err}'")
 
-    return connection
-
-"""---------------------------------------------------"""
-
-connection = create_db_connection("localhost", "root", "", "scrapy")
-
-def execute_query(connection, query):
-    cursor = connection.cursor()
-    try:
-        cursor.execute(query)
-        connection.commit()
-       # print("Query successful")
-    except Error as err:
-        print(f"Error: '{err}'")
-"""---------------------------------------------------"""
-mydb = mysql.connector.connect(
-  host="localhost",
-  user="root",
-  password="",
-  database="scrapy"
-)
 
         
 """------inicio get assets"""
 
-mycursor = mydb.cursor()
+mycursor = BD.mydb.cursor()
 mycursor.execute("SELECT asset FROM `economiccalendar`")
 myresultCalendar = mycursor.fetchall() 
 nombresActivosCalendar=[]
@@ -64,7 +30,7 @@ def calendarUpdate(activoName):
      stockCalendar = yf.Ticker(activoName)
      dataCalendar= ( stockCalendar.get_earnings_dates())
      fechas_lista = dataCalendar.index.tolist()
-    except Error as err:
+    except BD.Error as err:
         print(err)
     try:    
         current_date = datetime.now(pytz.timezone('America/New_York'))
@@ -85,8 +51,8 @@ def calendarUpdate(activoName):
         else:
             query = "INSERT INTO `economiccalendar`(`asset`, `date`,`EPS`) VALUES ('" + str(activoName) + "','"+ str(fecha_mas_cercana_futuro)+ "','"+ str(row_data.values[0])+ "')"  
             
-            execute_query(connection, query)
-    except Error as err:
+            BD.execute_query(BD.connection, query)
+    except BD.Error as err:
        print(err)
     return    dias_faltantes(fecha_mas_cercana_futuro)
 

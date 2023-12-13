@@ -25,7 +25,8 @@ def create_db_connection(host_name, user_name, user_password, db_name):
 
 """---------------------------------------------------"""
 
-connection = create_db_connection("localhost", "root", "", "scrapy")
+#connection = create_db_connection("localhost", "root", "", "scrapy")
+connection = create_db_connection("50.87.144.185", "datodtal_scrapy", "%V]B]Rvvl}uo", "datodtal_scrapy")
 
 def execute_query(connection, query):
     cursor = connection.cursor()

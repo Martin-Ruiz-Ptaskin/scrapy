@@ -1,6 +1,7 @@
 const express= require("express") //importo Express
 const app = express() // Creo una instancia
 const miFunciones = require("./controllers/notificationControler.js");
+//const stockFunciones=require("./controllers/Stocks.js")
 
 
 
@@ -26,3 +27,10 @@ miFunciones.alive()
 
 
 })
+app.get('/Stocks', function (req, res,bot) { // creo el servicio y mapeo la peticion /
+  let response=stockFunciones.Getstock()
+    res.write(response)
+    res.end()
+  
+  
+  })

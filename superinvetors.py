@@ -9,10 +9,9 @@ import time
 from bs4 import BeautifulSoup
 from selenium import webdriver 
 from datetime import date,datetime
-import mysql.connector
 import json
-from mysql.connector import Error
 from selenium.webdriver.common.by import By
+import DBconection as BD
 
 class assetsFromFound:
     def __init__(self,name,portfolioPart,value,cantidad,movimiento):
@@ -30,42 +29,12 @@ class urlName:
         self.name=name
         self.url = url
 
-def create_db_connection(host_name, user_name, user_password, db_name):
-    connection = None
-    try:
-        connection = mysql.connector.connect(
-            host=host_name,
-            user=user_name,
-            passwd=user_password,
-            database=db_name
-        )
-        print("MySQL Database connection successful")
-    except Error as err:
-        print(f"Error: '{err}'")
-
-    return connection
 
 """---------------------------------------------------"""
 
-connection = create_db_connection("localhost", "root", "", "scrapy")
 
-def execute_query(connection, query):
-    cursor = connection.cursor()
-    try:
-        cursor.execute(query)
-        connection.commit()
-        #print("Query successful")
-    except Error as err:
-        print(f"Error: '{err}'")
-"""---------------------------------------------------"""
-mydb = mysql.connector.connect(
-  host="localhost",
-  user="root",
-  password="",
-  database="scrapy"
-)
 def superInvestorsMain():
-    mycursor = mydb.cursor()
+    mycursor = BD.mydb.cursor()
 
     mycursor.execute("SELECT * FROM `founds`")
     cachelist=[]
@@ -109,7 +78,7 @@ def superInvestorsMain():
                        dif ="+$" + str(diferencia*(-1))
                        query = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento`,`tipo_investor`,`own`) VALUES ('" + \
                           activoEnWeb['name'] + "','"+name+ "','"+  activoEnWeb['cantidad']+ "','"+ str(dif)+"','compra','fund','"+ activoEnWeb['portfolioPart']+ "' )"
-                       execute_query(connection, query)
+                       BD.execute_query(BD.connection, query)
 
                    if(diferencia >0):
                        dif ="-$" + str(diferencia)
@@ -117,7 +86,7 @@ def superInvestorsMain():
 
                        query = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento` ,`tipo_investor`,own) VALUES ('" + \
                           activoEnWeb['name'] + "','"+name+ "','"+ activoEnWeb['cantidad']+ "','"+str(dif)+"','venta','fund','"+ activoEnWeb['portfolioPart']+ "' )"
-                       execute_query(connection, query)
+                       BD.execute_query(BD.connection, query)
                    if(diferencia ==0):
                        """print("nada en " + str(diferencia) +activoEnWeb['name'])"""
 
@@ -160,7 +129,7 @@ def superInvestorsMain():
            else:
             #print(key+"no existe")
             query = "INSERT INTO `superinvestorkey`(`clave`) VALUES ('" +key+"' )"
-            execute_query(connection, query)
+            BD.execute_query(BD.connection, query)
             toBeScraped.append(urlName(name,url))
     driver.close()
     data=[]
@@ -220,18 +189,18 @@ def superInvestorsMain():
                #print(found.activity)
                query = "UPDATE `founds` SET `assets`='" + \
                    found.activity +"' WHERE `name`='" + found.name + "'"
-               execute_query(connection, query)
+               BD.execute_query(BD.connection, query)
                query = "INSERT INTO `notificaciones`(`activo`, `data`,`tipoNotificacion`,`importancia`) VALUES ('" + \
                   found.name + "','"+str(found.activity)+"','fond',80)"
                print(query)
-               execute_query(connection, query)
+               BD.execute_query(BD.connection, query)
 
             else:
                print("entra en insert")
                query = "INSERT INTO `founds`(`name`, `assets`) VALUES ('" + \
                   found.name + "','"+str(found.activity)+"')"
                print(query)
-               execute_query(connection, query)
+               BD.execute_query(BD.connection, query)
 
                actividad=json.loads(found.activity)
                #print(actividad)
@@ -241,10 +210,10 @@ def superInvestorsMain():
                    query = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento`,`tipo_investor`,`own`) VALUES ('" + \
                       activoEnWeb['name'] + "','"+ found.name+ "','"+ activoEnWeb['cantidad'] + "','+"+ activoEnWeb['value']+"','compra','fund','"+ activoEnWeb['portfolioPart']+ "')"
                    #print(query)
-                   execute_query(connection, query)
+                   BD.execute_query(BD.connection, query)
                query = "INSERT INTO `notificaciones`(`activo`, `data`,`tipoNotificacion`,`importancia`) VALUES ('" + \
                   found.name + "','"+found.activity+"','fond',80)"
-               execute_query(connection, query)
+               BD.execute_query(BD.connection, query)
 superInvestorsMain()
 
 

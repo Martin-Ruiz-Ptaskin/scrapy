@@ -12,43 +12,7 @@ import json
 from selenium import webdriver 
 from selenium.webdriver.common.by import By
 import matplotlib.pyplot as plt
-import mysql.connector
-from mysql.connector import Error
-def create_db_connection(host_name, user_name, user_password, db_name):
-    connection = None
-    try:
-        connection = mysql.connector.connect(
-            host=host_name,
-            user=user_name,
-            passwd=user_password,
-            database=db_name
-        )
-        print("MySQL Database connection successful")
-    except Error as err:
-        print(f"Error: '{err}'")
-
-    return connection
-
-"""---------------------------------------------------"""
-
-connection = create_db_connection("localhost", "root", "", "scrapy")
-
-def execute_query(connection, query):
-    cursor = connection.cursor()
-    try:
-        cursor.execute(query)
-        connection.commit()
-        #print("Query successful")
-    except Error as err:
-        print(f"Error: '{err}'")
-"""---------------------------------------------------"""
-mydb = mysql.connector.connect(
-  host="localhost",
-  user="root",
-  password="",
-  database="scrapy"
-)
-
+import DBconection as BD
 class investor:
     def __init__(self,name,assets,realCID):
         self.name=name
@@ -126,7 +90,7 @@ def crearNotificaciones(ActyvityFromBD,activity,name):
 
 
 
-mycursor = mydb.cursor()
+mycursor = BD.mydb.cursor()
 
 def Etoromain():
     driver = webdriver.Chrome(executable_path=r'C:\Users\Usuario\scrapy\chromedriver.exe')
@@ -201,14 +165,14 @@ def Etoromain():
          crearNotificaciones(activityFromBD,json.dumps(datajsonUsr),cache.name)
          query = "UPDATE `inversores` SET `stocks`='" + \
            json.dumps(datajsonUsr) +"' WHERE `name`='" + id.name + "'"
-         execute_query(connection, query)
+         BD.execute_query(BD.connection, query)
         
         else:
          #print("entra en insert")
 
          query = "INSERT INTO `inversores`(`name`, `stocks`) VALUES ('" + \
           id.name + "','"+json.dumps(id.assets)+"')"
-         execute_query(connection, query)
+         BD.execute_query(BD.connection, query)
          
          
     etiquetas = [] # Etiquetas para cada porción de la torta
