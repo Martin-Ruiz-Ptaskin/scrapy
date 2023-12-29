@@ -6,6 +6,7 @@ const miFunciones = require("./controllers/notificationControler.js");
 
 
 app.listen(3000)//uso el puerto 3000
+app.use(express.json());
 
 
 
@@ -27,9 +28,11 @@ miFunciones.alive()
 
 
 })
-app.get('/Stocks', function (req, res,bot) { // creo el servicio y mapeo la peticion /
-  let response=stockFunciones.Getstock()
-    res.write(response)
+app.post('/customNotification', function (req, res,bot) { // creo el servicio y mapeo la peticion /
+  let body=(req.body)
+  miFunciones.customNotification(body
+    , res)
+    res.write("Bien")
     res.end()
   
   

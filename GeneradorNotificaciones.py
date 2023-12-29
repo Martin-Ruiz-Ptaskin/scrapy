@@ -13,7 +13,7 @@ from selenium.webdriver.common.by import By
 import yfinance as yf
 import DBconection as BD
 import EconomicCalendar
-        
+import CustomNotifactor        
 
 class activoFromBd:
     def __init__(self,idOp,activo,cantidad,operador,value,interesados,tipo,position,own,bigsell,idList,fecha):
@@ -48,7 +48,7 @@ for rest in myresult:
 fecha_actual = datetime.now()
 
 # Restar un mes
-fecha_mes_pasado = fecha_actual - timedelta(days=60)  # Se asume que un mes tiene aproximadamente 30 días
+fecha_mes_pasado = fecha_actual - timedelta(days=160)  # Se asume que un mes tiene aproximadamente 30 días
 
 # Formatear la fecha en el formato deseado
 fecha_formateada = fecha_mes_pasado.strftime("%Y-%m-%d")   
@@ -58,6 +58,7 @@ print("SELECT *FROM `activosenoperaciones` WHERE `fecha` >`"+fecha_formateada+"`
 myresult = mycursor.fetchall() 
 Assets=[]  
 for rest in myresult:
+    print(rest[1])
     resultados= rest[0]
     Assets.append(activoFromBd(rest[0],rest[1], rest[3], rest[2], rest[5],1,rest[7],rest[9],rest[8],0,[],rest[4]))
 
@@ -153,14 +154,14 @@ def mainNoti():
           """Verifico si existe y """
           """Si Existe se queda en 0 quiere decir que no hay nuevos en el subset y si es 1, si continues es 1 quiere decir que debe continuar ya que no hay nada nuevo que agregar """
           if noti.activo ==enBD.activo:
-              print("entra")
+              #print("entra")
 
               set1 = set(noti.idList)
               set2 = set(eval(enBD.idList))
-              print(set1,set2 , noti.activo)
+              #print(set1,set2 , noti.activo)
               if set1.issubset(set2):
                continues=1
-               print("ya existe")
+               #print("ya existe")
                break
               else:
                print("no existe")
@@ -174,17 +175,17 @@ def mainNoti():
                 
              fechaEconomica=EconomicCalendar.calendarUpdate(noti.activo)
              ticker_yahoo = yf.Ticker(noti.activo)
-             print(ticker_yahoo)
+             #print(ticker_yahoo)
 
-             print(fechaEconomica)
+             #print(fechaEconomica)
              data = ticker_yahoo.history()
+             last_quote = data['Close'].iloc[-1]
+
             except:
                 print("err al obtener fecha economica")
             
-            last_quote = data['Close'].iloc[-1]
             BigSellMultiplication=1
             fechaEconimocaMultipliation=1
-            print(noti.bigsell)
             if noti.bigsell>1:
                 BigSellMultiplication*noti.bigsell
             if fechaEconomica !=False:
@@ -223,5 +224,45 @@ def mainNoti():
              print("No es el update " +noti.activo)
              query="INSERT INTO `notificaciones`( `activo`, `data`, `monto`, `interesados`, `Precio_int`, `tipoNotificacion`,`importancia` ,`ExtraData`,`relatedActivosEnOperacion`   ) VALUES ('"+noti.activo+"','"+("["+noti.operador +"]" ) +"','"+str(noti.value) +"','"+ str(noti.interesados)+"','"+ str(last_quote) +"','Insider','"+ str(importancia) +"','"+ str(fechaEconomica) +"','"+ str(noti.idList) +"')"
              BD.execute_query(BD.connection, query)
+            #customNotification(noti.activo, noti)    
+
+def customNotification(asset_deseado,noti):
+   
+    query_paso_1 = f"SELECT webID FROM stockprice WHERE asset = '{asset_deseado}'"
+    webID_result = None
+    
+    try:
+        BD.cursor.execute(query_paso_1)
+        webID_result = BD.cursor.fetchone()
+    except BD.Error as err:
+        print(f"Error: '{err}'")
+    finally:
+        if BD.connection:
+            BD.connection.close()
+    
+    if webID_result:
+        webID_obtenido = webID_result[0]
+    
+        # Paso 2: Buscar en la tabla usuarios si el webID está en la columna assets
+        query_paso_2 = f"SELECT * FROM usuarios WHERE FIND_IN_SET('{webID_obtenido}', assets) > 0"
+        usuarios_result = None
+    
+        try:
+            BD.cursor.execute(query_paso_2)
+            usuarios_result = BD.cursor.fetchall()
+        except  BD.Error as err:
+            print(f"Error: '{err}'")
+        finally:
+            if  BD.connection:
+                BD.connection.close()
+    
+        if usuarios_result:
+            print("Usuarios encontrados:")
+            for row in usuarios_result:
+                print(row)
+        else:
+            print("No se encontraron usuarios con el webID en la columna assets.")
+    else:
+        print(f"No se encontró webID para el asset '{asset_deseado}'.")
 
 mainNoti()

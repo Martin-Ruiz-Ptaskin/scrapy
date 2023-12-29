@@ -33,6 +33,8 @@ bot.onText(/\/echo (.+)/, (msg, match) => {
 bot.on('message', (msg) => {
   const chatId = msg.chat.id;
   //console.log(msg)
+
+  console.log(msg)
   console.log(chatId)
   msjColector.push( {id:chatId, texto:msg.text})
   console.log(msjColector.filter(msj=> msj.id ==chatId ))
@@ -84,6 +86,14 @@ connection.connect((err) => {
     bot.sendMessage(1914457326, "sigue vivo");
 
   }
+  function customNotification(body,res){
+    body.users.forEach(user=>{
+      console.log(user)
+      bot.sendMessage(user, body.notificaciones.data);
+
+    })
+
+  }
   // UPDATE NOTIFICACIONES
   function updateNotificaciones(id){ 
     const updateData = {
@@ -103,6 +113,6 @@ connection.query(query, [updateData, id], (err, results) => {
 
   // FIN UPDATE  NOTIFICACIONES
   module.exports = {
-    sendNotificaciones,updateNotificaciones,alive
+    sendNotificaciones,updateNotificaciones,alive,customNotification
    
   };

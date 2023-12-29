@@ -43,3 +43,4 @@ mydb = mysql.connector.connect(
   password="",
   database="scrapy"
 )
+cursor = mydb.cursor()
