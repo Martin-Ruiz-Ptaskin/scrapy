@@ -42,12 +42,19 @@ bot.on('message', (msg) => {
   // send a message to the chat acknowledging receipt of their message
   
 });
-const connection = mysql.createConnection({
+/*const connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
   password: '',
   database: 'scrapy'
+});*/
+const connection = mysql.createConnection({
+  host:"50.87.144.185",
+  user:"datodtal_scrapy",
+  password:"%V]B]Rvvl}uo",
+  database:"datodtal_scrapy"
 });
+
 connection.connect((err) => {
     if (err) {
       console.error('Error connecting to the database: ', err);

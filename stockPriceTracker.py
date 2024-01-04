@@ -42,6 +42,7 @@ for instrument in datajsonAsset["InstrumentDisplayDatas"]:
 driver.get('https://api.etorostatic.com/sapi/candles/closingprices.json?cv=2679181eacb94174273960facfcac4c8_acaacaf19d0c11e0b5936698f216eb94')
 dataPrice = driver.find_elements(By.XPATH,'//pre')[0].text
 datajsonPrice=json.loads(dataPrice)
+driver.close()
 for element in datajsonPrice:
     instrument_id = element["InstrumentId"]
     closing_price = element["OfficialClosingPrice"]

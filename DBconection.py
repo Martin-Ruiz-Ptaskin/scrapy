@@ -37,10 +37,16 @@ def execute_query(connection, query):
     except Error as err:
         print(f"Error: '{err}'")
 """---------------------------------------------------"""
-mydb = mysql.connector.connect(
+"""mydb = mysql.connector.connect(
   host="localhost",
   user="root",
   password="",
   database="scrapy"
+)"""
+mydb = mysql.connector.connect(
+  host="50.87.144.185",
+  user="datodtal_scrapy",
+  password="%V]B]Rvvl}uo",
+  database="datodtal_scrapy"
 )
 cursor = mydb.cursor()
