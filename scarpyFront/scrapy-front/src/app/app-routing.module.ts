@@ -3,9 +3,9 @@ import { Routes, RouterModule } from '@angular/router';
 import { SelectorAssetsComponent } from './commons/selector-assets/selector-assets.component';
 
 const routes: Routes = [
-  { path: '',  redirectTo: '/selector', pathMatch: 'full' },
+  //{ path: '',  redirectTo: '/selector', pathMatch: 'full' },
 
-  { path: 'selector', component: SelectorAssetsComponent },
+  { path: '', component: SelectorAssetsComponent },
 ];
 
 @NgModule({

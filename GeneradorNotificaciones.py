@@ -13,7 +13,65 @@ from selenium.webdriver.common.by import By
 import yfinance as yf
 import DBconection as BD
 import EconomicCalendar
-import CustomNotifactor        
+import requests
+import json
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Aug  4 18:47:59 2023
+
+@author: Usuario
+"""
+
+import mysql.connector
+from mysql.connector import Error
+BD.entorno
+def create_db_connection(host_name, user_name, user_password, db_name):
+    connection = None
+    try:
+        connection = mysql.connector.connect(
+            host=host_name,
+            user=user_name,
+            passwd=user_password,
+            database=db_name
+        )
+        print("MySQL Database connection successful")
+    except Error as err:
+        print(f"Error: '{err}'")
+
+    return connection
+
+"""---------------------------------------------------"""
+if BD.entorno!="prod":
+    connection = create_db_connection("localhost", "root", "", "scrapy")
+if BD.entorno=="prod":
+    connection = create_db_connection("50.87.144.185", "datodtal_scrapy", "%V]B]Rvvl}uo", "datodtal_scrapy")
+
+def execute_query(connection, query):
+    cursor = connection.cursor()
+    try:
+        cursor.execute(query)
+        connection.commit()
+        #print("Query successful")
+    except Error as err:
+        print(f"Error: '{err}'")
+"""---------------------------------------------------"""
+if BD.entorno!="prod":
+    print("hostBD :localhost")
+    mydb = mysql.connector.connect(
+      host="localhost",
+      user="root",
+      password="",
+      database="scrapy"
+    )
+
+if BD.entorno=="prod":
+    mydb = mysql.connector.connect(
+  host="50.87.144.185",
+  user="datodtal_scrapy",
+  password="%V]B]Rvvl}uo",
+  database="datodtal_scrapy"
+)
+cursor = mydb.cursor()
 
 class activoFromBd:
     def __init__(self,idOp,activo,cantidad,operador,value,interesados,tipo,position,own,bigsell,idList,fecha):
@@ -30,6 +88,29 @@ class activoFromBd:
         self.bigsell=bigsell
         self.idList=[idOp]
         self.fecha=[fecha]
+    def to_json(self):
+        try:
+            operador_dict = json.loads(self.operador)
+        except json.decoder.JSONDecodeError as e:
+            # Handle the case where self.operador is not a valid JSON string
+            print(f"Error decoding JSON: {e}")
+            operador_dict = None
+
+        return {
+            "idOp": self.idOp,
+            "activo": self.activo,
+            "operador": operador_dict,  # Convert the operador string to a dictionary
+            "cantidad": self.cantidad,
+            "value": self.value,
+            "interesados": self.interesados,
+            "tipo": self.tipo,
+            "position": self.position,
+            "own": self.own,
+            "bigsell": self.bigsell,
+            "idList": self.idList,
+            "fecha": self.fecha.isoformat() if isinstance(self.fecha, datetime) else None
+        }
+
         
 class notificacionesExistentes:
     def __init__(self,activo,idList):
@@ -38,7 +119,7 @@ class notificacionesExistentes:
        
 """------inicio get assets"""
 
-mycursor = BD.mydb.cursor()
+mycursor = mydb.cursor()
 mycursor.execute("SELECT activo,relatedActivosEnOperacion FROM `notificaciones` where tipoNotificacion='Insider' " )
 myresult = mycursor.fetchall() 
 nombresActivos=[]
@@ -52,13 +133,14 @@ fecha_mes_pasado = fecha_actual - timedelta(days=160)  # Se asume que un mes tie
 
 # Formatear la fecha en el formato deseado
 fecha_formateada = fecha_mes_pasado.strftime("%Y-%m-%d")   
+
 mycursor.execute("SELECT *FROM `activosenoperaciones` WHERE `fecha` >="+fecha_formateada+"")
 print("SELECT *FROM `activosenoperaciones` WHERE `fecha` >`"+fecha_formateada+"`")
 
 myresult = mycursor.fetchall() 
 Assets=[]  
 for rest in myresult:
-    print(rest[1])
+    print(rest[0])
     resultados= rest[0]
     Assets.append(activoFromBd(rest[0],rest[1], rest[3], rest[2], rest[5],1,rest[7],rest[9],rest[8],0,[],rest[4]))
 
@@ -93,14 +175,15 @@ def mainNoti():
              else :
                          elemento.value=str(elemento.value[2:])
          
-        except BD.Error as err:
+        except Error as err:
             elemento.value=0
             print(err)
         """----------------------------"""       
         if elemento.activo in ActivosParaEvaluarName:
+        
          for value in ActivosParaEvaluar:
-
               if value.activo ==elemento.activo:
+
                  if len(str(value.value))>2:
                      
                   value.value==0 
@@ -129,13 +212,21 @@ def mainNoti():
 
         else:
          
-
          ActivosParaEvaluarName.append(elemento.activo)
          ActivosParaEvaluar.append(elemento)
 
 
     for activos in ActivosParaEvaluar:
         """Validaciones para emitir notificaciones"""
+        print(" atock" )
+
+        print(activos.activo)
+        print(activos.value)
+        print(activos.interesados)
+        if activos.interesados>=7 and abs(int(activos.value)) <1000000:
+
+            EmitirNotificacion.append(activos)
+            continue
         if activos.interesados>=2 and abs(int(activos.value)) >1000000:
             EmitirNotificacion.append(activos)
             continue
@@ -154,14 +245,15 @@ def mainNoti():
           """Verifico si existe y """
           """Si Existe se queda en 0 quiere decir que no hay nuevos en el subset y si es 1, si continues es 1 quiere decir que debe continuar ya que no hay nada nuevo que agregar """
           if noti.activo ==enBD.activo:
-              #print("entra")
-
+              print("es aca")
+              print(noti.activo)
+                  
               set1 = set(noti.idList)
               set2 = set(eval(enBD.idList))
               #print(set1,set2 , noti.activo)
               if set1.issubset(set2):
                continues=1
-               #print("ya existe")
+               print("ya existe")
                break
               else:
                print("no existe")
@@ -208,61 +300,71 @@ def mainNoti():
                 query2 = "UPDATE `position traker` SET `precioTop`='"+ str(float(last_quote))+"', precioMin='"+ str(float(last_quote))+"'  WHERE  `activo`= '"+noti.activo+"'" 
                 print(query2)
 
-                BD.execute_query(BD.connection, query2)
+                execute_query(connection, query2)
             #(noti.activo, last_quote)
             else:
              query2="INSERT INTO `position traker`( `activo`, `precioCompra`, `precioTop`, `precioMin`) VALUES ('"+noti.activo+"','" +str(last_quote)+"','" +str(last_quote)+"','" +str(last_quote)+"')"
-             BD.execute_query(BD.connection, query2)
+             execute_query(connection, query2)
      
             ("error al obtener cotizacion")
             if existe==1:
              ("deberia entrar en el update " +noti.activo)
              update="UPDATE  `notificaciones` SET  `data`='"+("["+noti.operador +"]" ) +"', `monto`='"+ str(noti.value) +"', `relatedActivosEnOperacion`='"+ str(noti.idList) +"',`interesados`='"+str(noti.interesados)+"' , `Importancia`='"+str(importancia)+"' , `ExtraData`='"+str(fechaEconomica)+"', `usado`=0    WHERE activo='"+noti.activo+"' "
               
-             BD.execute_query(BD.connection, update)
+             execute_query(connection, update)
             else:
              print("No es el update " +noti.activo)
              query="INSERT INTO `notificaciones`( `activo`, `data`, `monto`, `interesados`, `Precio_int`, `tipoNotificacion`,`importancia` ,`ExtraData`,`relatedActivosEnOperacion`   ) VALUES ('"+noti.activo+"','"+("["+noti.operador +"]" ) +"','"+str(noti.value) +"','"+ str(noti.interesados)+"','"+ str(last_quote) +"','Insider','"+ str(importancia) +"','"+ str(fechaEconomica) +"','"+ str(noti.idList) +"')"
-             BD.execute_query(BD.connection, query)
-            #customNotification(noti.activo, noti)    
+             execute_query(connection, query)
+            customNotification(noti.activo)    
 
-def customNotification(asset_deseado,noti):
-   
+def customNotification(asset_deseado):
     query_paso_1 = f"SELECT webID FROM stockprice WHERE asset = '{asset_deseado}'"
     webID_result = None
     
     try:
-        BD.cursor.execute(query_paso_1)
-        webID_result = BD.cursor.fetchone()
-    except BD.Error as err:
+        mycursor.execute(query_paso_1)
+        webID_result = mycursor.fetchall()[0]
+        
+        print(webID_result)
+    except Error as err:
         print(f"Error: '{err}'")
-    finally:
-        if BD.connection:
-            BD.connection.close()
+   
     
-    if webID_result:
+    if webID_result[0]:
         webID_obtenido = webID_result[0]
     
         # Paso 2: Buscar en la tabla usuarios si el webID está en la columna assets
-        query_paso_2 = f"SELECT * FROM usuarios WHERE FIND_IN_SET('{webID_obtenido}', assets) > 0"
+        query_paso_2 = f"SELECT name FROM usuarios WHERE FIND_IN_SET('{webID_obtenido}', assets) > 0"
         usuarios_result = None
     
         try:
-            BD.cursor.execute(query_paso_2)
-            usuarios_result = BD.cursor.fetchall()
-        except  BD.Error as err:
+            cursor.execute(query_paso_2)
+            usuarios_result = cursor.fetchall()
+        except  Error as err:
             print(f"Error: '{err}'")
-        finally:
-            if  BD.connection:
-                BD.connection.close()
+           
     
         if usuarios_result:
             print("Usuarios encontrados:")
             for row in usuarios_result:
+                print("row")
                 print(row)
+                url = 'http://localhost:3000/customNotification'
+                try:
+
+                    data = {
+                        'users': row,
+                        'info':asset_deseado
+                    }
+                    requests.post(url,json=data)
+                except requests.exceptions.RequestException as e:
+                    # Handling exceptions
+                    print(f'Error making the POST request: {e}')
         else:
             print("No se encontraron usuarios con el webID en la columna assets.")
     else:
-        print(f"No se encontró webID para el asset '{asset_deseado}'.")
+        print("No se encontró webID para el asset "+ asset_deseado)
 
 mainNoti()
+#customNotification("nvda","hoal")

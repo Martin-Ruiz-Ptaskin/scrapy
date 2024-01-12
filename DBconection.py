@@ -8,6 +8,7 @@ Created on Fri Aug  4 18:47:59 2023
 import mysql.connector
 from mysql.connector import Error
 
+entorno="prod"
 def create_db_connection(host_name, user_name, user_password, db_name):
     connection = None
     try:
@@ -24,9 +25,10 @@ def create_db_connection(host_name, user_name, user_password, db_name):
     return connection
 
 """---------------------------------------------------"""
-
-#connection = create_db_connection("localhost", "root", "", "scrapy")
-connection = create_db_connection("50.87.144.185", "datodtal_scrapy", "%V]B]Rvvl}uo", "datodtal_scrapy")
+if entorno!="prod":
+    connection = create_db_connection("localhost", "root", "", "scrapy")
+if entorno=="prod":
+    connection = create_db_connection("50.87.144.185", "datodtal_scrapy", "%V]B]Rvvl}uo", "datodtal_scrapy")
 
 def execute_query(connection, query):
     cursor = connection.cursor()
@@ -37,13 +39,17 @@ def execute_query(connection, query):
     except Error as err:
         print(f"Error: '{err}'")
 """---------------------------------------------------"""
-"""mydb = mysql.connector.connect(
-  host="localhost",
-  user="root",
-  password="",
-  database="scrapy"
-)"""
-mydb = mysql.connector.connect(
+if entorno!="prod":
+    print("hostBD :localhost")
+    mydb = mysql.connector.connect(
+      host="localhost",
+      user="root",
+      password="",
+      database="scrapy"
+    )
+
+if entorno=="prod":
+    mydb = mysql.connector.connect(
   host="50.87.144.185",
   user="datodtal_scrapy",
   password="%V]B]Rvvl}uo",

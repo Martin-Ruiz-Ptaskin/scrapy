@@ -1,3 +1,4 @@
+const { text } = require("express");
 const NotificacionesService= require("../service/notificacionesService.js")
 //INICIO SQL
 const mysql = require('mysql2');
@@ -34,10 +35,22 @@ bot.on('message', (msg) => {
   const chatId = msg.chat.id;
   //console.log(msg)
 
-  console.log(msg)
+  console.log(msg.text)
+  url="https://econoba.martinruizptaskin.com.ar?key="+chatId
+  textoAenviar="Configura los activos sobre los que recibiras notificaciones " +url
   console.log(chatId)
-  msjColector.push( {id:chatId, texto:msg.text})
-  console.log(msjColector.filter(msj=> msj.id ==chatId ))
+  //msjColector.push( {id:chatId, texto:msg.text})
+  //console.log(msjColector.filter(msj=> msj.id ==chatId ))
+  switch(msg.text){
+    case "/activos":
+      bot.sendMessage(chatId, textoAenviar);
+      break
+    default:
+      bot.sendMessage(chatId, "envia /activos para comenzar a editar tus notificaciones");
+
+
+  }
+  
 
   // send a message to the chat acknowledging receipt of their message
   
@@ -47,7 +60,8 @@ bot.on('message', (msg) => {
   user: 'root',
   password: '',
   database: 'scrapy'
-});*/
+});
+*/
 const connection = mysql.createConnection({
   host:"50.87.144.185",
   user:"datodtal_scrapy",
@@ -93,14 +107,47 @@ connection.connect((err) => {
     bot.sendMessage(1914457326, "sigue vivo");
 
   }
-  function customNotification(body,res){
-    body.users.forEach(user=>{
-      console.log(user)
-      bot.sendMessage(user, body.notificaciones.data);
-
-    })
-
+  function customNotification(body, res) {
+    return new Promise((resolve, reject) => {
+      console.log("entra")
+      const query = `SELECT * FROM notificaciones WHERE activo = '${body.info}' LIMIT 1;`;
+      let msj = "";
+  
+      connection.query(query, (err, results) => {
+        if (err) {
+          console.error('Error fetching data: ', err);
+          reject(err); // Rechazamos la promesa en caso de error
+          return;
+        }
+  
+        if (results.length === 0) {
+          // Hacer algo si no hay resultados
+        } else {
+          const notificaciones = results;
+          const notidata = JSON.parse(notificaciones[0].data);
+  
+          msj = NotificacionesService.formatMessage(notidata, notificaciones[0].activo, notificaciones[0].tipoNotificacion, notificaciones[0]);
+  
+          // Enviamos la notificación después de obtener la respuesta de la base de datos
+          console.log(msj)
+          body.users.forEach(user => {
+            console.log(user)
+            try {
+              bot.sendMessage(user, msj);
+            } catch (error) {
+              console.log("Error sending message", error);
+            }
+          });
+  
+          // Resolvemos la promesa con los datos necesarios
+          resolve(notidata);
+        }
+      });
+    });
   }
+  
+  // Uso de la función
+  
   // UPDATE NOTIFICACIONES
   function updateNotificaciones(id){ 
     const updateData = {

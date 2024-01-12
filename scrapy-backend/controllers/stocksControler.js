@@ -1,11 +1,17 @@
 const NotificacionesService= require("../service/notificacionesService.js")
 //INICIO SQL
 const mysql = require('mysql2');
-const connection = mysql.createConnection({
+/*const connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
   password: '',
   database: 'scrapy'
+});*/
+const connection = mysql.createConnection({
+  host: '50.87.144.185',
+  user: 'datodtal_scrapy',
+  password: '%V]B]Rvvl}uo',
+  database: 'datodtal_scrapy'
 });
 async function Getstock() {
   return new Promise((resolve, reject) => {

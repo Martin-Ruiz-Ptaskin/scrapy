@@ -30,8 +30,17 @@ miFunciones.alive()
 })
 app.post('/customNotification', function (req, res,bot) { // creo el servicio y mapeo la peticion /
   let body=(req.body)
-  miFunciones.customNotification(body
-    , res)
+  console.log((req.body))
+  miFunciones.customNotification(body, res)
+  .then((notidata) => {
+    // Aquí puedes continuar con el código que depende de la respuesta de la base de datos
+    console.log("Operaciones después de recibir la respuesta de la base de datos", notidata);
+  })
+  .catch((error) => {
+    // Manejar errores aquí
+    console.error("Error en la función customNotification", error);
+  });
+
     res.write("Bien")
     res.end()
   
