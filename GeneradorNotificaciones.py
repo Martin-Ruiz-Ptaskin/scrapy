@@ -218,11 +218,7 @@ def mainNoti():
 
     for activos in ActivosParaEvaluar:
         """Validaciones para emitir notificaciones"""
-        print(" atock" )
-
-        print(activos.activo)
-        print(activos.value)
-        print(activos.interesados)
+        
         if activos.interesados>=7 and abs(int(activos.value)) <1000000:
 
             EmitirNotificacion.append(activos)
@@ -324,14 +320,15 @@ def customNotification(asset_deseado):
     
     try:
         mycursor.execute(query_paso_1)
-        webID_result = mycursor.fetchall()[0]
-        
+        resultadosSQL=mycursor.fetchall()
         print(webID_result)
     except Error as err:
         print(f"Error: '{err}'")
    
     
-    if webID_result[0]:
+    if resultadosSQL:
+        webID_result = resultadosSQL[0]
+
         webID_obtenido = webID_result[0]
     
         # Paso 2: Buscar en la tabla usuarios si el webID está en la columna assets
@@ -365,6 +362,8 @@ def customNotification(asset_deseado):
             print("No se encontraron usuarios con el webID en la columna assets.")
     else:
         print("No se encontró webID para el asset "+ asset_deseado)
+        query="INSERT INTO stockprice (asset, webID) SELECT '"+asset_deseado+"', MAX(webID) + 1 FROM stockprice; "
+        execute_query(connection,query)
 
 mainNoti()
 #customNotification("nvda","hoal")

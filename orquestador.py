@@ -42,7 +42,7 @@ while 1==1:
              print(f"Request failed with status code {response.status_code}")
          os.system('python scrapy/PriceStock.py')
          print("vivew")
-     time.sleep(600)
+     time.sleep(200)
  vueltas= vueltas+ 1
  print("vueltas ------------------- " + str(vueltas)+ "------------------------")
 

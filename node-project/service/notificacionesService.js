@@ -13,7 +13,6 @@ function formatMessage(data,activo,tipoNotificacion,notificaciones){
                 Message += `Activo : ${activity.name}\n`;
                 Message += `Parte del portfolio: ${activity.portfolioPart}%\n`;
                 Message += `Monto: ${activity.value}\n`;
-                Message += `Movimiento: ${activity.movimiento} \n`;
                 Message += `Cantidad: ${activity.cantidad} acciones\n`;
                 Message += '------\n';
             })
