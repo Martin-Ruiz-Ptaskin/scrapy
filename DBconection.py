@@ -56,3 +56,5 @@ if entorno=="prod":
   database="datodtal_scrapy"
 )
 cursor = mydb.cursor()
+
+

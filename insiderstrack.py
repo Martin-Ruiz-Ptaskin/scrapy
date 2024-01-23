@@ -4,6 +4,8 @@ Created on Tue Oct 18 15:06:30 2022
 
 @author: mruizpta
 """
+import requests
+import json
 
 import urllib.request
 import time
@@ -62,7 +64,7 @@ def mainInsider():
            fills =filing(date,code,company,trade,cargo,value,insider,qty,own)
            fillings.append(fills)
       except BD.Error as err:
-        print(err)
+          print(f"Error en la solicitud. Código de estado: {err}")
       for fill in fillings:
         key= str(fill.insider+fill.value+fill.date).replace("'", "")
 
@@ -70,25 +72,60 @@ def mainInsider():
         if key in contenido:
          print(key+"existe")
         else:
-           #print(key+"no existe")
-           query="INSERT INTO `insider`( `clave`, `name`, `company`, `amount`, `trade`, `date`, `cantidad`, `own`,`position`) VALUES ('"+fill.company+"','" +str(fill.insider).replace("'", "")+"','"+fill.code +"','"+fill.value+"','"+fill.tradetype+"','"+fill.date+"','"+fill.QTY+"','"+fill.own+"','"+ fill.title + "')"
-           BD.execute_query(BD.connection, query)
-           #print(fill.tradetype)
-           query = "INSERT INTO `insiderkey`(`clave`) VALUES ('" +str(key).replace("'", "")+"' )"
-           BD.execute_query(BD.connection, query)
+            
+            
+            
+           print(key+"no existe")
+          
            operacion =""
            if fill.tradetype=="P - Purchase":
                operacion="compra"
                
            if fill.tradetype=="S - Sale" or fill.tradetype =="S - Sale+OE": 
                operacion="venta"
-           #print(operacion)
-           query2 = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento`,`tipo_investor`,`own`,`position`) VALUES ('" + \
-              fill.code+ "','"+str(fill.insider).replace("'", "")+ "','"+fill.QTY+ "','"+fill.value+"','"+ operacion + "','insider','"+ fill.own + "','"+ fill.title + "' )"
-           #print(query2)
-           BD.execute_query(BD.connection, query2)
+           url1 = "https://econoba.martinruizptaskin.com.ar/php/generarNotificacion.php"
 
-      
+          # Datos que deseas enviar (si es necesario)
+
+          # Añadir encabezados de aceptación y tipo de contenido
+          
+           fill.operacion=operacion
+           insider_dict = fill.__dict__
+
+# Convertir el diccionario a una cadena JSON
+           insider_json = json.dumps(insider_dict, indent=2)
+
+# Imprimir el resultado
+
+
+           headers = {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              "User-Agent": "XY"
+          }    
+          # Realizar la solicitud POST con los encabezados y datos
+           print(insider_json)
+           response = requests.post(url1, headers=headers, json=insider_json)
+
+           # Verificar el código de estado
+           if response.status_code == 200:
+               # El contenido de la respuesta
+              result = response.json()
+              print(result)
+           else:
+              print(f"Error en la solicitud. Código de estado: {response.status_code}")
+           url2 = "https://econoba.martinruizptaskin.com.ar/php/insider.php"
+           
+           response = requests.post(url2, headers=headers, json=insider_json)
+           
+           
+        # Verificar el código de estado
+           if response.status_code == 200:
+          # El contenido de la respuesta
+            result = response.json()
+            print(result)
+           else:
+            print(f"Error en la solicitud. Código de estado: {response.status_code}")
 
     except:
       print(BD.Error)

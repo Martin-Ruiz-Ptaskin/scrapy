@@ -14,12 +14,18 @@ while 1==1:
 
 
  tiempo=0
- os.system('python scrapy/insiderstrack.py')
- #os.system('python scrapy/maybeEtoroWin.py')
- os.system('python scrapy/superinvetors.py')
- os.system('python scrapy/GeneradorNotificaciones.py')
- print("vuelta fuera")
-
+ try:
+     print("entra insiderstrack")
+     #os.system('python scrapy/insiderstrack.py')
+     #os.system('python scrapy/maybeEtoroWin.py')
+     print("entra superinvetors")
+     os.system('python scrapy/superinvetors.py')
+     print("entra GeneradorNotificaciones")
+     os.system('python scrapy/GeneradorNotificaciones.py')
+     print("vuelta fuera")
+ except Exception as e:
+    print(f"Se ha producido un error: {e}")
+    
  while tiempo<3:
      tiempo+=1
      print(tiempo)
@@ -42,7 +48,7 @@ while 1==1:
              print(f"Request failed with status code {response.status_code}")
          os.system('python scrapy/PriceStock.py')
          print("vivew")
-     time.sleep(200)
+     time.sleep(600)
  vueltas= vueltas+ 1
  print("vueltas ------------------- " + str(vueltas)+ "------------------------")
 

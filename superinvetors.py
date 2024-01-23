@@ -5,6 +5,10 @@ Created on Sun Oct 23 21:57:49 2022
 @author: mruizpta
 """
 import urllib.request
+import sys
+
+# Agrega la ruta al directorio que contiene DBconection.py
+sys.path.append(r'C:\Users\Usuario\scrapy')
 import time
 from bs4 import BeautifulSoup
 from selenium import webdriver 
