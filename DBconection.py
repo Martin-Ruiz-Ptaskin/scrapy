@@ -8,7 +8,7 @@ Created on Fri Aug  4 18:47:59 2023
 import mysql.connector
 from mysql.connector import Error
 
-entorno="prod"
+entorno="test"
 def create_db_connection(host_name, user_name, user_password, db_name):
     connection = None
     try:
