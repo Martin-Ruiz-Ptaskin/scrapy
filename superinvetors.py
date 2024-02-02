@@ -36,6 +36,7 @@ class urlName:
 
 """---------------------------------------------------"""
 
+print("entra") 
 
 def superInvestorsMain():
     mycursor = BD.mydb.cursor()

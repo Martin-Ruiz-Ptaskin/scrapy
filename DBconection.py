@@ -8,7 +8,8 @@ Created on Fri Aug  4 18:47:59 2023
 import mysql.connector
 from mysql.connector import Error
 
-entorno="test"
+entorno="prod"
+url=""
 def create_db_connection(host_name, user_name, user_password, db_name):
     connection = None
     try:
@@ -26,8 +27,10 @@ def create_db_connection(host_name, user_name, user_password, db_name):
 
 """---------------------------------------------------"""
 if entorno!="prod":
+    url="http://localhost/scrapy/"
     connection = create_db_connection("localhost", "root", "", "scrapy")
 if entorno=="prod":
+    url="https://econodata.com.ar/php/"
     connection = create_db_connection("50.87.144.185", "datodtal_scrapy", "%V]B]Rvvl}uo", "datodtal_scrapy")
 
 def execute_query(connection, query):

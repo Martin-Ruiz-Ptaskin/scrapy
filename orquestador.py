@@ -16,7 +16,7 @@ while 1==1:
  tiempo=0
  try:
      print("entra insiderstrack")
-     #os.system('python scrapy/insiderstrack.py')
+     os.system('python scrapy/insiderstrack.py')
      #os.system('python scrapy/maybeEtoroWin.py')
      print("entra superinvetors")
      os.system('python scrapy/superinvetors.py')
@@ -40,7 +40,7 @@ while 1==1:
          else:
              print(f"Request failed with status code {response.status_code}")
      if tiempo==2:
-         #response = requests.get("http://localhost:3000/alive")
+         response = requests.get("http://localhost:3000/alive")
          if response.status_code == 200:
              # Print the response content (usually JSON or HTML)
              print("vive")

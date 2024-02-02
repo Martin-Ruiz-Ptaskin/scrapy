@@ -5,14 +5,12 @@ Created on Tue Oct 18 15:06:30 2022
 @author: mruizpta
 """
 import sys
+import requests
 
 sys.path.append(r'C:\Users\Usuario\scrapy')
-
-import requests
 import json
-import makeRequest
+
 import urllib.request
-import time
 from bs4 import BeautifulSoup
 import DBconection as BD
 
@@ -30,18 +28,33 @@ class filing:
         self.value = value
         self.insider = insider
         self.operacion= operacion
+print("entra") 
 
+def makeRequest(url,data):
+    headers = {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+    "User-Agent": "XY"
+}
+    respuesta = requests.post(url, data=data, headers=headers)
+
+    # Verificar la respuesta
+    if respuesta.status_code == 200:
+        print("Solicitud POST exitosa:")
+        print(respuesta.text)
+    else:
+        print(f"Error en la solicitud POST. Código de estado: {respuesta.status_code}")
+        print(respuesta.text)
 def mainInsider():
-    
        mycursor = BD.mydb.cursor()
 
        mycursor.execute("SELECT clave FROM `insiderkey`")
        contenido=[]
-       myresultado = []#mycursor.fetchall()    
+       myresultado = mycursor.fetchall()    
        datos = urllib.request.urlopen("http://openinsider.com/screener?s=&o=&pl=&ph=&ll=&lh=&fd=730&fdr=&td=0&tdr=&fdlyl=&fdlyh=&daysago=&xp=1&xs=1&vl=&vh=&ocl=&och=&sic1=-1&sicl=100&sich=9999&grp=0&nfl=&nfh=&nil=&nih=&nol=&noh=&v2l=&v2h=&oc2l=&oc2h=&sortcol=0&cnt=100&page=1").read().decode()
        soup =BeautifulSoup(datos,"html.parser")
        table = soup.find_all("tbody")
-       
+       print("buscoinfo")
 
        line =table[1].find_all("tr")
        """filing=filing("hoy","TSLA","teska","BUY","CEO","1000","Elon")"""
@@ -51,7 +64,7 @@ def mainInsider():
       
     
        for rest in myresultado:
-            #print(rest[0])
+            print(rest[0])
             contenido.append(rest[0])
                 
          
@@ -81,25 +94,41 @@ def mainInsider():
         if key in contenido:
          print(key+"existe")
         else:
-            
-            
-            
-           print(key+"no existe")
-          
-       
-           url1 = "http://localhost/generarActivo.php"
+          print(key+"no existe")
+          print( json.dumps(fill.__dict__))
+          urlInsider = BD.url + "insider.php"
+          urlAO = BD.url +"activosenoperaciones.php"
+          urlKey =BD.url + "insiderKey.php"
+          dataKey= {
+            "key":key,
+
+          }
+
+          data=json.dumps(fill.__dict__)
+          makeRequest(urlInsider,data)
+          makeRequest(urlAO,data)
+          makeRequest(urlKey,json.dumps(dataKey))
 
           
-          
-           insider_dict = fill.__dict__
+          """
+          query="INSERT INTO `insider`( `clave`, `name`, `company`, `amount`, `trade`, `date`, `cantidad`, `own`,`position`) VALUES ('"+fill.company+"','" +str(fill.insider).replace("'", "")+"','"+fill.code +"','"+fill.value+"','"+fill.tradetype+"','"+fill.date+"','"+fill.QTY+"','"+fill.own+"','"+ fill.title + "')"
+          BD.execute_query(BD.connection, query)
+          print(fill.tradetype)
+          query = "INSERT INTO `insiderkey`(`clave`) VALUES ('" +str(key).replace("'", "")+"' )"
+          BD.execute_query(BD.connection, query)
+          operacion =""
+          if fill.tradetype=="P - Purchase":
+              operacion="compra"
+              
+          if fill.tradetype=="S - Sale" or fill.tradetype =="S - Sale+OE": 
+              operacion="venta"
+          #print(operacion)
+          query2 = "INSERT INTO `activosenoperaciones`(`activo`, `operador`,`cantidad`,`value`,`movimiento`,`tipo_investor`,`own`,`position`) VALUES ('" + \
+             fill.code+ "','"+str(fill.insider).replace("'", "")+ "','"+fill.QTY+ "','"+fill.value+"','"+ operacion + "','insider','"+ fill.own + "','"+ fill.title + "' )"
+          print(query2)
+          BD.execute_query(BD.connection, query2)
+          """
 
-# Convertir el diccionario a una cadena JSON
-           insider_json = json.dumps(insider_dict, indent=2)
-           makeRequest.makeRequest(url1, insider_json)
-
-           #url2 = "https://econoba.martinruizptaskin.com.ar/php/insider.php"
-           url2 = "http://localhost/generarActivo.php"
-           makeRequest.makeRequest(url2, insider_json)
-
+     
 
 mainInsider()
