@@ -16,6 +16,7 @@ from datetime import date,datetime
 import json
 from selenium.webdriver.common.by import By
 import DBconection as BD
+from selenium.webdriver.chrome.service import Service
 
 class assetsFromFound:
     def __init__(self,name,portfolioPart,value,cantidad,movimiento):
@@ -99,7 +100,14 @@ def superInvestorsMain():
 
     """------------------ fin generar notificaciones--------------"""
 
-    driver = webdriver.Chrome(executable_path=r'C:\Users\Usuario\scrapy\chromedriver.exe')
+    options = webdriver.ChromeOptions()
+    options.add_argument('--ignore-certificate-errors')
+    service = Service(executable_path=r'C:\Users\Usuario\scrapy\chromedriver.exe')
+
+    driver_path = r'C:\Users\Usuario\scrapy\chromedriver.exe'
+    driver = webdriver.Chrome(service=service, options=options)
+
+
     mycursor.execute("SELECT clave FROM `superinvestorkey`")
     contenido=[]
     myresultado = mycursor.fetchall()   
@@ -139,7 +147,7 @@ def superInvestorsMain():
     driver.close()
     data=[]
     for url in toBeScraped:
-             driver = webdriver.Chrome(executable_path=r'C:\Users\Usuario\scrapy\chromedriver.exe')
+             driver = webdriver.Chrome(service=service)
              driver.get(url.url)
              hold= driver.find_element(By.ID,"grid")
             
