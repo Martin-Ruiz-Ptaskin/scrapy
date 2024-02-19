@@ -1,6 +1,8 @@
 const express= require("express") //importo Express
 const app = express() // Creo una instancia
 const miFunciones = require("./controllers/notificationControler.js");
+const userService = require("./service/userService.js");
+
 //const stockFunciones=require("./controllers/Stocks.js")
 
 
@@ -8,6 +10,7 @@ const miFunciones = require("./controllers/notificationControler.js");
 app.listen(3000)//uso el puerto 3000
 app.use(express.json());
 
+userService.getUSer()
 
 
 app.get('/', function (req, res,bot) { // creo el servicio y mapeo la peticion /
@@ -28,6 +31,20 @@ miFunciones.alive()
 
 
 })
+app.get('/user', function (req, res,bot) { // creo el servicio y mapeo la peticion /
+  userService.getUSer()
+    res.write("Bien")
+    res.end()
+  
+  
+  })
+  app.get('/Adduser', function (req, res,bot) { // creo el servicio y mapeo la peticion /
+    userService.AddUser(6520824352)
+      res.write("Bien")
+      res.end()
+    
+    
+    })
 app.post('/customNotification', function (req, res,bot) { // creo el servicio y mapeo la peticion /
   let body=(req.body)
   console.log((req.body))

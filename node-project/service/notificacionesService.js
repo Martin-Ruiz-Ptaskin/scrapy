@@ -2,10 +2,14 @@
 
 function formatMessage(data,activo,tipoNotificacion,notificaciones){
    console.log(notificaciones)
+    let fecha = new Date(notificaciones.date);
+    let fechaComun = fecha.toISOString().split('T')[0];
    let Message=''
     if(tipoNotificacion=='fond'){
         Message += 'Fondo de inversión ACTIVITY\n-----------------------\n';
         Message += `Fondo: ${activo}\n-----------------------\n`;
+        Message += `fecha: ${fechaComun}\n-----------------------\n`;
+
         data.sort((a, b) => parseFloat(b.portfolioPart) - parseFloat(a.portfolioPart));
         let  seisMayores = data.slice(0, 6);
         seisMayores.forEach((activity) => {
@@ -14,6 +18,8 @@ function formatMessage(data,activo,tipoNotificacion,notificaciones){
                 Message += `Parte del portfolio: ${activity.portfolioPart}%\n`;
                 Message += `Monto: ${activity.value}\n`;
                 Message += `Cantidad: ${activity.cantidad} acciones\n`;
+                Message += `movimiento: ${activity.movimiento} \n`;
+
                 Message += '------\n';
             })
             

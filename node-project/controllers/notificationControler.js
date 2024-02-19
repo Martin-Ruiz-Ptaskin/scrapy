@@ -1,6 +1,9 @@
 const { text } = require("express");
+const userService = require("../service/userService.js");userService
 const NotificacionesService = require("../service/notificacionesService.js");
-const mysql = require('mysql2');
+
+const DBconecion = require("../service/conection.js");
+
 const TelegramBot = require('node-telegram-bot-api');
 
 // replace the value below with the Telegram token you receive from @BotFather
@@ -8,13 +11,7 @@ const token = '6374242902:AAGIWd6vkwID8LOmTEy5Y9Q6cDzOjIuBRUo';
 const bot = new TelegramBot(token, { polling: true });
 
 // MySQL Connection Pool
-const pool = mysql.createPool({
-  connectionLimit: 10, // Puedes ajustar este límite según tus necesidades
-  host: "50.87.144.185",
-  user: "datodtal_scrapy",
-  password: "%V]B]Rvvl}uo",
-  database: "datodtal_scrapy"
-});
+
 
 // Matches "/echo [whatever]"
 bot.onText(/\/echo (.+)/, (msg, match) => {
@@ -25,7 +22,22 @@ bot.onText(/\/echo (.+)/, (msg, match) => {
 
 bot.on('message', (msg) => {
   const chatId = msg.chat.id;
-  console.log(msg.text);
+  console.log(msg.chatId);
+  if ((msg.new_chat_members && msg.new_chat_members.length > 0  ) ) {
+    // Aquí puedes realizar acciones específicas si alguien se une al grupo
+    const nuevoMiembro = msg.new_chat_members[0];
+    const chatIdNuevoMiembro = nuevoMiembro.id;
+    userService.AddUser(chatIdNuevoMiembro)
+    console.log(`Nuevo miembro se unió al grupo. Chat ID: ${chatIdNuevoMiembro}`);
+
+    return; // No enviar ningún mensaje cuando alguien se une al grupo
+  }
+  if (  msg.left_chat_member ) {
+    // Aquí puedes realizar acciones específicas si alguien se une al grupo
+    
+    console.log('Nuevo miembro(s) se fue del grupo');
+    return; // No enviar ningún mensaje cuando alguien se une al grupo
+  }
 
   const url = "https://econoba.martinruizptaskin.com.ar?key=" + chatId;
   const textoAenviar = "Configura los activos sobre los que recibirás notificaciones " + url;
@@ -45,7 +57,7 @@ async function sendNotificaciones(req, res) {
     'SELECT *FROM notificaciones WHERE id = (SELECT id FROM notificaciones WHERE usado = 0 AND Importancia = (SELECT MAX(Importancia) FROM notificaciones WHERE usado = 0 LIMIT 1)LIMIT 1) LIMIT 1;';
  ;    
     // Usar la función pool.query en lugar de connection.query
-    pool.query(query, (err, results) => {
+    DBconecion.pool.query(query, (err, results) => {
       if (err) {
         console.error('Error fetching data: ', err);
         reject(err);
@@ -80,7 +92,7 @@ function customNotification(body, res) {
     let msj = "";
 
     // Usar la función pool.query en lugar de connection.query
-    pool.query(query, (err, results) => {
+    DBconecion.pool.query(query, (err, results) => {
       if (err) {
         console.error('Error fetching data: ', err);
         reject(err);
@@ -116,7 +128,7 @@ function updateNotificaciones(id) {
   const query = 'UPDATE notificaciones SET ? WHERE id = ?';
 
   // Usar la función pool.query en lugar de connection.query
-  pool.query(query, [updateData, id], (err, results) => {
+  DBconecion.pool.query(query, [updateData, id], (err, results) => {
     if (err) {
       console.error('Error updating data: ', err);
       return;
@@ -129,13 +141,13 @@ function updateNotificaciones(id) {
 
 // Cerrar el pool de conexiones cuando la aplicación se apague
 process.on('SIGINT', () => {
-  pool.end();
+  DBconecion.pool.end();
   console.log('Connection pool closed.');
   process.exit();
 });
 
 process.on('exit', () => {
-  pool.end();
+  DBconecion.pool.end();
   console.log('Connection pool closed.');
 });
 
